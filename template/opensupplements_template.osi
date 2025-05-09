@@ -1,0 +1,93 @@
+{
+  "artgEntry": {
+    "artgNumber": "[ARTG Number]",
+    "productName": "[Product Name]",
+    "type": "[e.g., Medicine Listed]",
+    "sponsor": "[Sponsor Name]",
+    "postalAddress": "[Sponsor Postal Address]",
+    "artgStartDate": "[YYYY-MM-DD]",
+    "productCategory": "[e.g., Medicine]",
+    "status": "[e.g., Active, Discontinued]",
+    "approvalArea": "[e.g., Listed Medicines]"
+  },
+  "conditions": [
+    "[Placeholder for Condition Text 1]",
+    "[Placeholder for Condition Text 2]"
+  ],
+  "products": [
+    {
+      "productName": "[Product Name - can be same as above]",
+      "productType": "[e.g., Single Medicine Product]",
+      "effectiveDate": "[YYYY-MM-DD]"
+    }
+  ],
+  "permittedIndications": [
+    {
+      "text": "[Indication Text 1 e.g., Maintain/support immune system health]",
+      "evidenceNotes": "[Placeholder for notes on evidence]"
+    },
+    {
+      "text": "[Indication Text 2]",
+      "evidenceNotes": "[Placeholder for notes on evidence]"
+    }
+  ],
+  "indicationRequirements": [
+    "[Indication Requirement Text 1 e.g., Label statement: If symptoms persist...]",
+    "[Indication Requirement Text 2]"
+  ],
+  "standardIndications": "[e.g., No Standard Indications included on Record or specific text]",
+  "specificIndications": "[e.g., No Specific Indications included on Record or specific text]",
+  "warnings": [
+    "[Warning Text 1 e.g., Always read the label and follow the directions for use.]",
+    "[Warning Text 2 e.g., If symptoms persist, talk to your health professional.]"
+  ],
+  "dosageInformation": {
+    "adults": "[Dosage instructions for adults e.g., Take 1 tablet once a day...]",
+    "children": "[Dosage instructions for children, if applicable]",
+    "generalNotes": "[Any general notes about dosage or use]"
+  },
+  "allergenInformation": {
+    "containsAllergens": ["[e.g., Soya bean products]", "[e.g., Sulfites]"],
+    "freeOfClaims": ["[e.g., Gluten-Free]", "[e.g., Dairy-Free]"],
+    "allergenStatement": "[Full allergen statement from product e.g., Contains soya bean products and sulfites.]",
+    "crossContaminationRisk": null // boolean: true, false, or null if unknown
+  },
+  "additionalProductInformation": {
+    "packSizeInformation": {
+      "packSize": "[e.g., 60 Tablets, 250g Powder or null]",
+      "poisonSchedule": "[e.g., S2, S3 or null]"
+    }
+  },
+  "components": [
+    {
+      "formulation": "[e.g., Formulation 1, Main Formulation]",
+      "dosageForm": "[e.g., Tablet, film coated, Capsule, Powder]",
+      "routeOfAdministration": "[e.g., Oral, Topical]",
+      "visualIdentification": "[Description of product appearance or null]",
+      "activeIngredients": [
+        {
+          "name": "[Full Chemical or Botanical Name of Active Ingredient 1]",
+          "commonName": "[Common Name e.g., Vitamin C, Andrographis]",
+          "quantity": "[Amount e.g., 250 mg, 120 mg]",
+          "equivalentTo": "[Equivalent amount if applicable e.g., Andrographis paniculata (Dry) 6 g or null]"
+        },
+        {
+          "name": "[Full Chemical or Botanical Name of Active Ingredient 2]",
+          "commonName": "[Common Name]",
+          "quantity": "[Amount]",
+          "equivalentTo": "[Equivalent amount or null]"
+        }
+      ],
+      "excipients": [
+        {"name": "[Excipient Name 1]"},
+        {"name": "[Excipient Name 2]"}
+      ]
+    }
+  ],
+  "documentInformation": {
+    "dataEntrySource": "[e.g., Product Label, Manufacturer Website, TGA Summary PDF]",
+    "dataEntryDate": "[YYYY-MM-DD of data entry]",
+    "version": "0.2-template",
+    "notes": "[Any notes about this data entry or template version]"
+  }
+}
