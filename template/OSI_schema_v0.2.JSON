@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/catsandsoup/OpenSupplementsInitiative/OSI_schema_v0.2.0.json",
-  "version": "0.2.0", // Version of this OpenSupp schema document
+  "version": "0.2.0",
   "description": "Schema for v0.2 of the OpenSupp supplement data format, designed for interoperability and clarity in representing dietary supplement information. This version includes enhanced sections for clinical trials, evidence, interactions, contraindications, adverse effects, intended population, storage, product identifiers, and structured quantities/warnings.",
   "type": "object",
   "properties": {
