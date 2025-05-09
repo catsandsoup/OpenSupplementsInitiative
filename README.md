@@ -1,4 +1,4 @@
-# Open Suppliments Initiative
+# Open Supplements Initiative
 Standardising supplement information for healthcare software interoperability and public accessibility.
 
 ## Mission Statement
