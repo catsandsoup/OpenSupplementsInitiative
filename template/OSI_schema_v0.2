@@ -1,0 +1,367 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/catsandsoup/OpenSupplementsInitiative/OSI_schema_v0.2.0.json",
+  "version": "0.2.0", // Version of this OpenSupp schema document
+  "description": "Schema for v0.2 of the OpenSupp supplement data format, designed for interoperability and clarity in representing dietary supplement information. This version includes enhanced sections for clinical trials, evidence, interactions, contraindications, adverse effects, intended population, storage, product identifiers, and structured quantities/warnings.",
+  "type": "object",
+  "properties": {
+    "artgEntry": {
+      "type": "object",
+      "description": "Details related to regulatory listings, primarily based on Australian TGA ARTG information but adaptable for other regulatory bodies.",
+      "properties": {
+        "artgNumber": { "type": "string", "description": "The unique Australian Register of Therapeutic Goods (ARTG) number or a similar primary regulatory identifier from another jurisdiction." },
+        "productName": { "type": "string", "description": "The official name of the product as registered or listed with the regulatory body." },
+        "alternateNames": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Other names or brand variations the product might be known by. Optional."
+        },
+        "type": { "type": "string", "description": "The type of entry, e.g., 'Medicine Listed', 'Device Class I'." },
+        "sponsor": { "type": "string", "description": "The name of the company or entity responsible for the product in the specified jurisdiction." },
+        "postalAddress": { "type": "string", "description": "The official postal address of the sponsor." },
+        "artgStartDate": { "type": "string", "format": "date", "description": "The date (YYYY-MM-DD) when the product was first entered onto the register." },
+        "productCategory": { "type": "string", "description": "The category assigned to the product by the regulatory body, e.g., 'Medicine', 'Device'." },
+        "status": { "type": "string", "description": "The current regulatory status of the product, e.g., 'Active', 'Cancelled', 'Suspended'." },
+        "approvalArea": { "type": "string", "description": "The specific area of approval or listing, e.g., 'Listed Medicines', 'Assessed Listed Medicines'." }
+      },
+      "required": ["artgNumber", "productName", "sponsor", "status"],
+      "additionalProperties": false
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Any specific conditions of listing or sale imposed by the regulatory body.",
+      "items": { "type": "string" }
+    },
+    "products": {
+      "type": "array",
+      "description": "Basic product identification details if differing from the main ARTG entry or for multi-component products.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "productName": { "type": "string", "description": "Product name, can be the same as artgEntry.productName." },
+          "alternateNames": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Other names or brand variations for this specific product entry. Optional."
+          },
+          "productType": { "type": "string", "description": "e.g., Single Medicine Product." },
+          "effectiveDate": { "type": "string", "format": "date", "description": "Effective date for this specific product information (YYYY-MM-DD)." }
+        },
+        "required": ["productName", "productType"],
+        "additionalProperties": false
+      }
+    },
+    "permittedIndications": {
+      "type": "array",
+      "description": "Approved or stated uses/health claims for the product.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "The text of the indication or health claim." },
+          "evidenceNotes": { "type": "string", "description": "Placeholder for nutritionist's notes or brief summary of evidence for this indication." }
+        },
+        "required": ["text"],
+        "additionalProperties": false
+      }
+    },
+    "indicationRequirements": {
+      "type": "array",
+      "description": "Mandatory statements or conditions related to the product's indications.",
+      "items": { "type": "string" }
+    },
+    "standardIndications": { "type": "string", "description": "Standard indications text, if applicable." },
+    "specificIndications": { "type": "string", "description": "Specific indications text, if applicable." },
+    "warnings": {
+      "type": "array",
+      "description": "Safety warnings, advisories, and mandatory label statements. For structured interaction and contraindication details, see 'interactions' and 'contraindicationsAdverseEffects' sections.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "The full text of the warning or advisory statement." },
+          "type": {
+            "type": "string",
+            "description": "Categorization of the warning (e.g., 'MandatoryLabel', 'GeneralAdvisory', 'Pregnancy', 'AllergenRelated', 'InteractionPotential', 'Dosing'). Optional.",
+            "enum": ["MandatoryLabel", "GeneralAdvisory", "Pregnancy", "AllergenRelated", "InteractionPotential", "Dosing", "Storage", "Other"]
+          },
+          "source": {
+            "type": "string",
+            "description": "Source or basis of the warning (e.g., 'TGA Requirement', 'Manufacturer Recommendation', 'Standard Practice'). Optional."
+          }
+        },
+        "required": ["text"],
+        "additionalProperties": false
+      }
+    },
+    "dosageInformation": {
+      "type": "object",
+      "description": "Recommended dosages and usage instructions.",
+      "properties": {
+        "adults": { "type": "string", "description": "Dosage instructions specifically for adults." },
+        "children": { "type": "string", "description": "Dosage instructions specifically for children, if applicable." },
+        "generalNotes": { "type": "string", "description": "Any general notes about dosage, administration (e.g., 'with food'), or usage duration." }
+      },
+      "additionalProperties": false
+    },
+    "allergenInformation": {
+      "type": "object",
+      "description": "Information regarding allergens present or explicitly absent.",
+      "properties": {
+        "containsAllergens": { "type": "array", "items": { "type": "string" }, "description": "List of known allergens the product contains." },
+        "freeOfClaims": { "type": "array", "items": { "type": "string" }, "description": "List of 'free-from' claims." },
+        "allergenStatement": { "type": "string", "description": "A specific allergen advisory statement." },
+        "crossContaminationRisk": { "type": ["boolean", "null"], "description": "Indicates risk of cross-contamination (true/false, or null if unknown)." }
+      },
+      "additionalProperties": false
+    },
+    "additionalProductInformation": {
+      "type": "object",
+      "description": "Other product-specific details.",
+      "properties": {
+        "packSizeInformation": {
+          "type": "object",
+          "properties": {
+            "packSize": { "type": ["string", "null"], "description": "Description of the pack size." },
+            "poisonSchedule": { "type": ["string", "null"], "description": "Poisons schedule classification." }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "type": "array",
+      "description": "Details of the product's formulation(s).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "formulation": { "type": "string", "description": "Identifier for the formulation." },
+          "dosageForm": { "type": "string", "description": "The physical form of the supplement." },
+          "routeOfAdministration": { "type": "string", "description": "How the supplement is intended to be administered." },
+          "visualIdentification": { "type": ["string", "null"], "description": "A physical description of the product's appearance." },
+          "activeIngredients": {
+            "type": "array", "description": "List of active ingredients.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "description": "Full chemical, botanical, or standardized name." },
+                "commonName": { "type": "string", "description": "Commonly known name." },
+                "quantity": {
+                  "type": "object",
+                  "description": "Amount of the ingredient.",
+                  "properties": {
+                    "value": { "type": "number", "description": "Numerical value of the quantity." },
+                    "unit": { "type": "string", "description": "Unit of measure (e.g., mg, mcg, g, IU)." }
+                  },
+                  "required": ["value", "unit"],
+                  "additionalProperties": false
+                },
+                "equivalentTo": {
+                  "type": "object",
+                  "description": "Statement of equivalence if applicable (e.g., to dry herb or elemental mineral). Optional.",
+                  "properties": {
+                    "substance": {"type": "string", "description": "Name of the substance it's equivalent to."},
+                    "value": {"type": "number", "description": "Numerical value of the equivalent quantity."},
+                    "unit": {"type": "string", "description": "Unit of measure for the equivalent quantity."}
+                  },
+                  "required": ["substance", "value", "unit"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["name", "commonName", "quantity"], "additionalProperties": false
+            }
+          },
+          "excipients": {
+            "type": "array", "description": "List of other ingredients (excipients).",
+            "items": {
+              "type": "object",
+              "properties": { "name": { "type": "string", "description": "Name of the excipient." } },
+              "required": ["name"], "additionalProperties": false
+            }
+          }
+        },
+        "required": ["formulation", "dosageForm", "activeIngredients", "excipients"],
+        "additionalProperties": false
+      }
+    },
+    "clinicalTrials": {
+      "type": "array",
+      "description": "Links to and summaries of clinical trials relevant to this product or its key ingredients. Optional.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "trialId": { "type": "string", "description": "Unique identifier for the trial (e.g., NCT number, ACTRN)." },
+          "url": { "type": "string", "format": "uri", "description": "Direct URL to the trial registration or primary publication." },
+          "title": { "type": "string", "description": "Official title or a brief, descriptive summary of the trial." },
+          "status": { "type": "string", "description": "Current status of the trial (e.g., 'Completed', 'Recruiting')." },
+          "phase": { "type": "string", "description": "Phase of the clinical trial (e.g., 'Phase 1', 'Not Applicable')." },
+          "outcomeSummary": { "type": "string", "description": "Brief, objective summary of the trial's main outcomes." },
+          "completionDate": { "type": "string", "format": "date", "description": "Actual or anticipated primary completion date (YYYY-MM-DD)." },
+          "population": { "type": "string", "description": "Brief description of the study population." },
+          "intervention": { "type": "string", "description": "Brief description of the intervention used." }
+        },
+        "required": ["trialId", "url", "title"],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "evidenceRegulatorySummary": {
+      "type": "object",
+      "description": "A summary of key evidence and regulatory points. Optional.",
+      "properties": {
+        "overallEvidenceStatement": { "type": "string", "description": "General summary of the evidence base for the product's intended uses." },
+        "keyRegulatoryPoints": { "type": "array", "items": { "type": "string" }, "description": "Important regulatory notes or classifications not covered elsewhere." },
+        "evidenceGradingSystemUsed": { "type": "string", "description": "Name of the evidence grading system referenced (e.g., 'NHMRC Levels of Evidence', 'GRADE')." },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "referenceType": { "type": "string", "description": "Type of reference (e.g., 'Systematic Review', 'Meta-analysis', 'Guideline')." },
+              "citation": { "type": "string", "description": "Full citation for the reference." },
+              "url": { "type": "string", "format": "uri", "description": "URL to the reference, if available." }
+            },
+            "required": ["referenceType", "citation"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "interactions": {
+      "type": "array",
+      "description": "Details of known or potential drug, nutrient, or herb interactions. Optional.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "interactingSubstanceName": { "type": "string", "description": "Name of the drug, nutrient, herb, or food it interacts with." },
+          "interactingSubstanceType": { "type": "string", "description": "Category of the interacting substance (e.g., 'Medication', 'Nutrient', 'Herb', 'Food')." },
+          "effect": { "type": "string", "description": "Description of the potential interaction effect." },
+          "severity": { "type": "string", "description": "Clinical significance or severity (e.g., 'Major', 'Moderate', 'Minor', 'Theoretical')." },
+          "mechanism": { "type": "string", "description": "Known or proposed mechanism of the interaction." },
+          "managementAdvice": { "type": "string", "description": "Recommendations for managing the potential interaction." },
+          "evidenceReferences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "referenceId": { "type": "string", "description": "Identifier for the evidence (e.g., PubMed ID, DOI)." },
+                "url": { "type": "string", "format": "uri", "description": "URL to the evidence source." },
+                "summary": { "type": "string", "description": "Brief summary of the evidence supporting this interaction." }
+              },
+              "required": ["referenceId"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["interactingSubstanceName", "interactingSubstanceType", "effect"],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "contraindicationsAdverseEffects": {
+      "type": "object",
+      "description": "Structured details on contraindications and known adverse effects. Optional.",
+      "properties": {
+        "contraindications": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string", "description": "Medical condition, patient group, or situation where the product is contraindicated." },
+              "description": { "type": "string", "description": "Further details or rationale for the contraindication." },
+              "targetPopulation": { "type": "string", "description": "Specific population this contraindication applies to (if different from general)." },
+              "severity": { "type": "string", "description": "Severity of risk (e.g., 'Absolute', 'Relative', 'Use with caution')." }
+            },
+            "required": ["condition", "description"],
+            "additionalProperties": false
+          }
+        },
+        "adverseEffects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "effectDescription": { "type": "string", "description": "Description of the adverse effect." },
+              "frequency": { "type": "string", "description": "Reported or estimated frequency (e.g., 'Common >1/100', 'Rare <1/10000', 'Unknown')." },
+              "severity": { "type": "string", "description": "Typical severity of the effect (e.g., 'Mild', 'Moderate', 'Severe')." },
+              "management": { "type": "string", "description": "Advice on managing the adverse effect if it occurs." }
+            },
+            "required": ["effectDescription"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "intendedPopulation": {
+      "type": "object",
+      "description": "Specifics about the intended user population for this product. Optional.",
+      "properties": {
+        "primaryTargetGroups": { "type": "array", "items": { "type": "string" }, "description": "Primary demographic groups (e.g., 'Adults', 'Elderly', 'Athletes', 'Children 12+ years')." },
+        "ageRange": {
+          "type": "object",
+          "properties": {
+            "minAge": { "type": "number", "description": "Minimum age for use." },
+            "maxAge": { "type": "number", "description": "Maximum age for use (if applicable)." },
+            "unit": { "type": "string", "enum": ["years", "months"], "description": "Unit for minAge and maxAge." }
+          },
+          "additionalProperties": false
+        },
+        "sex": { "type": "string", "enum": ["Any", "Male", "Female"], "description": "Intended sex, if specific." },
+        "specificConsiderations": { "type": "string", "description": "Other population-specific considerations or suitability notes (e.g., 'Suitable for vegetarians')." }
+      },
+      "additionalProperties": false
+    },
+    "storageShelfLife": {
+      "type": "object",
+      "description": "Information on product storage and stability. Optional.",
+      "properties": {
+        "storageConditions": { "type": "string", "description": "Recommended storage conditions (e.g., 'Store below 25°C in a cool, dry place.')." },
+        "shelfLifeMonths": { "type": "integer", "minimum": 0, "description": "Shelf life in months from date of manufacture." },
+        "useByInstructions": { "type": "string", "description": "Instructions after opening (e.g., 'Use within 3 months of opening.')." },
+        "batchNumberFormat": { "type": "string", "description": "Description or example of the batch number format used on packaging." },
+        "expiryDateFormat": { "type": "string", "description": "Description or example of the expiry date format (e.g., 'MM/YYYY', 'DD/MM/YYYY')." }
+      },
+      "required": ["storageConditions"],
+      "additionalProperties": false
+    },
+    "productIdentifiers": {
+      "type": "array",
+      "description": "Standardized product identifiers like GS1 GTIN or internal SKUs. Optional.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "identifierType": { "type": "string", "description": "Type of identifier (e.g., 'GS1 GTIN-13', 'SKU', 'UPC-A', 'EAN-8')." },
+          "identifierValue": { "type": "string", "description": "The actual identifier code or number." },
+          "issuer": { "type": "string", "description": "The organization or system that issued/manages this identifier (e.g., 'GS1', 'Internal Company System')." }
+        },
+        "required": ["identifierType", "identifierValue"],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "documentInformation": {
+      "type": "object",
+      "description": "Metadata about this specific data entry/file.",
+      "properties": {
+        "dataEntrySource": { "type": "string", "description": "Origin of the data for this file." },
+        "dataEntryDate": { "type": "string", "format": "date", "description": "Date this data file was created/updated (YYYY-MM-DD)." },
+        "version": { "type": "string", "description": "Version of this data file or the OpenSupp format it adheres to." },
+        "notes": { "type": "string", "description": "Specific notes about this data entry." }
+      },
+      "required": ["dataEntrySource", "dataEntryDate", "version"],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "artgEntry",
+    "products",
+    "permittedIndications",
+    "warnings",
+    "dosageInformation",
+    "allergenInformation",
+    "components",
+    "documentInformation"
+  ],
+  "additionalProperties": false
+}
