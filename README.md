@@ -3,9 +3,11 @@ Standardising supplement information for healthcare software interoperability an
 
 ## Mission Statement
 
-This project is dedicated to revolutionising dietary supplement information management by establishing a clear, comprehensive, and **interoperable** data format, moving beyond the limitations of hosted PDFs and commercial/proprietary databases. Currently,  supplement details are often fragmented and inconsistent. Our mission is to cut through this complexity by developing a machine-readable, interoperable, and signable framework that ensures consistency and global interoperability of listed supplement information from certifying organisations such as the TGA (Australia).
+This project is dedicated to overhauling dietary supplement information management by establishing a clear, comprehensive, and **interoperable** data format, moving beyond the limitations of static PDFs and commercial/proprietary databases.
 
-OSI aims to empower healthcare professionals with efficacious, accurate, and personalised client care tools. This standard will allow **medical databases, patient management software, and other health applications to directly link to and utilise trusted supplement data** 
+Currently, supplement details are often fragmented and inconsistent. Our mission is to cut through this complexity by developing a machine-readable, interoperable, and signable framework that ensures consistency and global interoperability of listed supplement information from certifying organisations such as the TGA (Australia).
+
+This standard will allow **medical databases, patient management software, and other health applications to directly link to and utilise trusted supplement data** 
 
 ---
 
@@ -17,6 +19,7 @@ The management and utilisation of dietary supplement information currently face 
 * **Inconsistency:** The same product or ingredient can be described differently, making accurate comparisons and data aggregation difficult.
 * **Inefficiency:** Healthcare practitioners, particularly nutritionists and dietitians, spend considerable time collating and verifying supplement details.
 * **Limited Interoperability:** There is a lack of a standardised format that allows different software systems (e.g., electronic health records, patient management software, research databases) to easily consume and share supplement data.
+
 
 ---
 
