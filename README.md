@@ -1,4 +1,4 @@
-# OpenSupplimentsInitiative
+# Open Suppliments Initiative
 Standardising supplement information for healthcare software interoperability and public accessibility.
 
 ## Mission Statement
@@ -39,14 +39,14 @@ This project proposes the **OpenSupp**, a structured JSON (JavaScript Object Not
 This repository hosts the foundational elements of the Supplement Data Standardization Project:
 
 * **This `README.md` file:** An overview of the project, its mission, and the data format.
-* **`/template/supplement_data_template_v0.2.json`:** A blank, generic template file representing the Supplidata Format v0.2. This can be used as a starting point for creating new supplement data records.
+* **`/template/supplement_data_template_v0.2.json`:** A blank, generic template file representing the OSI Format v0.1. This can be used as a starting point for creating new supplement data records.
 * **`/examples/` directory:** Contains populated example files that demonstrate how the template is used for different (fictional) products.
     * `example_000001_magneaze_megamag.osi`: A detailed example of a multi-ingredient formula.
     * *(Future examples may include different product types like single-ingredient supplements, herbal formulas, etc.)*
 
 ---
 
-## Overview of the Supplidata Format v0.2 Structure
+## Overview of the OSI Format v0.1 Structure
 
 The `supplement_data_template_v0.1.osi` file outlines the core structure. Key sections include:
 
