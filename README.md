@@ -23,7 +23,7 @@ The management and utilisation of dietary supplement information currently face 
 
 ---
 
-## Our Solution: The OpenSupp Format v0.1
+## Our Solution: The OSI Format
 
 This project proposes the **OpenSupp**, a structured JSON (JavaScript Object Notation) template designed to address these challenges. This format provides a consistent and comprehensive way to record dietary supplement information.
 
