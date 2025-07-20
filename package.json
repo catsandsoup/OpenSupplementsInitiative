@@ -1,0 +1,32 @@
+{
+  "name": "osi-platform",
+  "version": "1.0.0",
+  "description": "Open Supplements Initiative - MVP Platform",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "db:migrate": "cd server && npm run migrate",
+    "db:seed": "cd server && npm run seed"
+  },
+  "keywords": [
+    "supplements",
+    "certification",
+    "healthcare",
+    "regulatory"
+  ],
+  "author": "OSI Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "docker": "^0.2.14"
+  }
+}

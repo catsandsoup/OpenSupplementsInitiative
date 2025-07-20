@@ -1,90 +1,163 @@
-# Open Supplements Initiative
-Standardising supplement information for healthcare software interoperability and public accessibility.
+# OSI Platform MVP
 
-## Mission Statement
+Open Supplements Initiative - A comprehensive platform for standardizing and certifying dietary supplement information.
 
-This project is dedicated to overhauling dietary supplement information management by establishing a clear, comprehensive, and **interoperable** data format, moving beyond the limitations of static PDFs and commercial/proprietary databases.
+## Overview
 
-Currently, supplement details are often fragmented and inconsistent. Our mission is to cut through this complexity by developing a machine-readable, interoperable, and signable framework that ensures consistency and global interoperability of listed supplement information from certifying organisations such as the TGA (Australia).
+The OSI Platform provides a complete end-to-end system for:
+- Manufacturers to submit detailed product data with evidence
+- OSI staff to review and verify submissions
+- Digital certificate generation with cryptographic signatures
+- Public product catalog with verification capabilities
 
-This standard will allow **medical databases, patient management software, and other health applications to directly link to and utilise trusted supplement data** 
+## Quick Start
 
----
+### Prerequisites
+- Node.js (v16 or higher)
+- Docker and Docker Compose
+- Git
 
-## The Problem
+### Setup Instructions
 
-The management and utilisation of dietary supplement information currently face significant challenges:
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd osi-platform
+   ```
 
-* **Data Fragmentation:** Information is scattered across manufacturer websites, regulatory body summaries (like the TGA in Australia), product labels, and research articles, often with varying levels of detail and format.
-* **Inconsistency:** The same product or ingredient can be described differently, making accurate comparisons and data aggregation difficult.
-* **Inefficiency:** Healthcare practitioners, particularly nutritionists and dietitians, spend considerable time collating and verifying supplement details.
-* **Limited Interoperability:** There is a lack of a standardised format that allows different software systems (e.g., electronic health records, patient management software, research databases) to easily consume and share supplement data.
+2. **Install dependencies**
+   ```bash
+   npm run install:all
+   ```
 
+3. **Start the database**
+   ```bash
+   npm run docker:up
+   ```
 
----
+4. **Set up environment variables**
+   ```bash
+   cp server/.env.example server/.env
+   # Edit server/.env with your configuration
+   ```
 
-## Our Solution: The OSI Format
+5. **Run database migrations and seed data**
+   ```bash
+   npm run db:migrate
+   npm run db:seed
+   ```
 
-This project proposes the **OpenSupp**, a structured JSON (JavaScript Object Notation) template designed to address these challenges. This format provides a consistent and comprehensive way to record dietary supplement information.
+6. **Start the development servers**
+   ```bash
+   npm run dev
+   ```
 
-**Key principles of the OpenSupp Format:**
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001
 
-* **Standardisation:** Provides a defined set of fields for common supplement attributes.
-* **Clarity:** Organises information logically for both human readability and machine processing.
-* **Comprehensiveness:** Aims to capture a wide range of data points relevant to clinical practice and regulatory oversight.
-* **Interoperability:** The structured nature facilitates easier integration with other systems.
-* **Authority-Linked:** Designed to accommodate and reference official identifiers, initially including TGA ARTG.
+### Demo Accounts
 
----
+After seeding the database, you can use these demo accounts:
 
-## What This Repository Contains
+- **Admin**: admin@osi.org / admin123
+- **Manufacturer**: demo@healthsupplements.com / manufacturer123
 
-This repository hosts the foundational elements of the Supplement Data Standardization Project:
+## Project Structure
 
-* **This `README.md` file:** An overview of the project, its mission, and the data format.
-* **`/template/supplement_data_template_v0.2.json`:** A blank, generic template file representing the OSI Format v0.1. This can be used as a starting point for creating new supplement data records.
-* **`/examples/` directory:** Contains populated example files that demonstrate how the template is used for different (fictional) products.
-    * `example_000001_magneaze_megamag.osi`: A detailed example of a multi-ingredient formula.
-    * *(Future examples may include different product types like single-ingredient supplements, herbal formulas, etc.)*
+```
+osi-platform/
+├── client/                 # React frontend
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── contexts/       # React contexts
+│   │   └── utils/          # Utility functions
+│   └── package.json
+├── server/                 # Node.js backend
+│   ├── database/           # Database schema and migrations
+│   ├── middleware/         # Express middleware
+│   ├── routes/             # API routes
+│   └── package.json
+├── docker-compose.yml      # Docker services
+└── package.json           # Root package.json
+```
 
----
+## API Endpoints
 
-## Overview of the OSI Format v0.1 Structure
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+- `GET /api/auth/me` - Get current user
 
-The `supplement_data_template_v0.1.osi` file outlines the core structure. Key sections include:
+### Supplements
+- `GET /api/supplements` - List supplements
+- `POST /api/supplements` - Create supplement
+- `GET /api/supplements/:id` - Get supplement details
+- `PUT /api/supplements/:id` - Update supplement
 
-* **`artgEntry`**: Details related to regulatory listings (e.g., TGA ARTG number, sponsor, product status).
-* **`conditions`**: Any conditions of listing or sale.
-* **`products`**: Basic product identification.
-* **`permittedIndications`**: Approved or stated uses, with a field for evidence notes.
-* **`indicationRequirements`**: Mandatory statements or conditions related to indications.
-* **`warnings`**: Critical safety warnings and advisories.
-* **`dosageInformation`**: Recommended dosages for different groups and general usage notes.
-* **`allergenInformation`**: Detailed information on contained allergens, "free-from" claims, and allergen statements.
-* **`components`**:
-    * `activeIngredients`: Detailed list including full name, common name, quantity, and equivalents.
-    * `excipients`: List of other ingredients.
-* **`documentInformation`**: Metadata about the data entry itself (source, date, version).
+### Certificates
+- `GET /api/certificates` - List certificates
+- `POST /api/certificates` - Generate certificate
+- `GET /api/certificates/:id` - Get certificate details
 
-For a complete understanding of all fields and their intended use, please refer to the blank template file in the `/template/` directory.
+### Public API
+- `GET /api/public/supplements` - Public supplement catalog
+- `GET /api/public/verify/:osiNumber` - Verify certificate
 
----
+## Database Schema
 
-## Example Snippet: Active Ingredients
+The platform uses PostgreSQL with the following core tables:
+- `users` - User accounts and authentication
+- `organizations` - Company/manufacturer profiles
+- `supplements` - Product data in OSI JSON format
+- `certificates` - Digital certificates and signatures
+- `documents` - Uploaded evidence files
+- `audit_logs` - System audit trail
 
-```json
-// From: components[0].activeIngredients
-[
-  {
-    "name": "Calcium ascorbate dihydrate",
-    "commonName": "Vitamin C",
-    "quantity": "242.1 mg",
-    "equivalentTo": "ascorbic acid (Vitamin C) 200 mg"
-  },
-  {
-    "name": "Colecalciferol",
-    "commonName": "Vitamin D3",
-    "quantity": "0.0125 mg",
-    "equivalentTo": "Vitamin D3 500 IU"
-  }
-]
+## Development
+
+### Running Tests
+```bash
+cd server && npm test
+cd client && npm test
+```
+
+### Database Operations
+```bash
+# Reset database
+npm run docker:down
+npm run docker:up
+npm run db:migrate
+npm run db:seed
+
+# View database
+docker exec -it osi-postgres psql -U osi_user -d osi_platform
+```
+
+### Building for Production
+```bash
+npm run build
+npm start
+```
+
+## MVP Demo Flow
+
+1. **Manufacturer Registration**: Company creates account and submits product data
+2. **Evidence Upload**: Upload third-party lab tests, certificates, and studies
+3. **Admin Review**: OSI staff reviews and verifies all submitted evidence
+4. **Certificate Generation**: System generates cryptographically signed certificate
+5. **Public Verification**: Product appears in public catalog with QR code verification
+
+## Next Steps
+
+This MVP provides the foundation for:
+- Advanced digital signature implementation
+- Blockchain integration for certificate transparency
+- Mobile applications for QR code scanning
+- Integration with regulatory authorities (TGA, FDA)
+- Advanced search and filtering capabilities
+
+## Support
+
+For questions or issues, please contact the OSI development team.
