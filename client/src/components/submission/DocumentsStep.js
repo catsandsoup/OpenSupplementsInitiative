@@ -693,11 +693,14 @@ Note: This is a template for demonstration purposes only.`;
                       onChange={(e) => linkDocumentToIngredient(docIndex, `Claim: ${e.target.value}`)}
                       label="Link to Health Claim"
                     >
-                      {data.permittedIndications?.map((claim, idx) => (
-                        <MenuItem key={idx} value={claim.text}>
-                          {claim.text.substring(0, 50)}...
-                        </MenuItem>
-                      ))}
+                      {data.permittedIndications?.map((claim, idx) => {
+                        const claimText = typeof claim === 'string' ? claim : claim?.text || 'Health claim';
+                        return (
+                          <MenuItem key={idx} value={claimText}>
+                            {claimText.substring(0, 50)}...
+                          </MenuItem>
+                        );
+                      })}
                     </Select>
                   </FormControl>
                 </Grid>

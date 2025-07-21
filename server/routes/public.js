@@ -101,6 +101,31 @@ router.get('/supplements/:id', async (req, res) => {
   }
 });
 
+// GET /api/public/supplements/:id/certificate - Get certificate for specific supplement (public access)
+router.get('/supplements/:id/certificate', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query(`
+      SELECT c.id, c.osi_number, c.issued_at, c.expires_at, c.status, c.certificate_data, c.digital_signature
+      FROM certificates c
+      INNER JOIN supplements s ON c.supplement_id = s.id
+      WHERE s.id = $1 AND c.status = 'active'
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Certificate not found' });
+    }
+
+    res.json({
+      certificate: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Get supplement certificate error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/public/verify/:osiNumber - Verify certificate by OSI number (public access)
 router.get('/verify/:osiNumber', async (req, res) => {
   try {

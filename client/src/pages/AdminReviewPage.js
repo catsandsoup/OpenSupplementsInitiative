@@ -459,8 +459,12 @@ const AdminReviewPage = () => {
                 {osiData?.permittedIndications?.map((indication, index) => (
                   <ListItem key={index} divider>
                     <ListItemText
-                      primary={indication.text}
-                      secondary={indication.evidenceNotes}
+                      primary={
+                        typeof indication === 'string' 
+                          ? indication 
+                          : indication?.text || 'Health claim information not available'
+                      }
+                      secondary={indication?.evidenceNotes}
                     />
                   </ListItem>
                 ))}
@@ -541,7 +545,11 @@ const AdminReviewPage = () => {
                       <ListItemIcon>
                         <WarningIcon color="warning" />
                       </ListItemIcon>
-                      <ListItemText primary={warning} />
+                      <ListItemText primary={
+                        typeof warning === 'string' 
+                          ? warning 
+                          : warning?.text || warning?.warning || 'Warning information not available'
+                      } />
                     </ListItem>
                   ))}
                 </List>

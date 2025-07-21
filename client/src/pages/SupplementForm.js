@@ -200,7 +200,7 @@ const SupplementForm = () => {
         // Convert warnings to simple strings
         warnings: (formData.warnings || []).map(w => {
           if (typeof w === 'string') return w;
-          if (typeof w === 'object') return w.text || w.warning || JSON.stringify(w);
+          if (typeof w === 'object') return w.text || w.warning || 'Warning text not available';
           return String(w);
         }),
         // Ensure components have proper structure

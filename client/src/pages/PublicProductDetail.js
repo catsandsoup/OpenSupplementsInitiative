@@ -135,6 +135,12 @@ const PublicProductDetail = () => {
   const primaryComponent = components[0] || {};
   const activeIngredients = primaryComponent.activeIngredients || [];
   const excipients = primaryComponent.excipients || [];
+  const additionalInfo = osiData.additionalProductInformation || {};
+  const manufacturingDetails = additionalInfo.manufacturingDetails || {};
+  const supplierDetails = additionalInfo.supplierDetails || [];
+  const permittedIndications = osiData.permittedIndications || [];
+  const warnings = osiData.warnings || [];
+  const dosageInfo = osiData.dosageInformation || {};
   const certStatus = getCertificateStatus();
 
   return (
@@ -172,7 +178,7 @@ const PublicProductDetail = () => {
                 </Box>
 
                 <Typography variant="body1" color="text.secondary" paragraph>
-                  {artgEntry.productDescription || 'No description available'}
+                  {additionalInfo.productDescription || 'No description available'}
                 </Typography>
               </Grid>
               
@@ -228,7 +234,7 @@ const PublicProductDetail = () => {
                   ARTG Number
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {artgEntry.artgId || 'Not registered'}
+                  {artgEntry.artgNumber || 'Not registered'}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -264,24 +270,27 @@ const PublicProductDetail = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {activeIngredients.map((ingredient, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Typography variant="body2" fontWeight="medium">
-                            {ingredient.ingredientName}
-                          </Typography>
-                          {ingredient.botanicalName && (
-                            <Typography variant="caption" color="text.secondary" display="block">
-                              {ingredient.botanicalName}
+                    {activeIngredients.map((ingredient, index) => {
+                      const supplier = supplierDetails.find(s => s.ingredient === ingredient.name) || {};
+                      return (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight="medium">
+                              {ingredient.commonName || ingredient.name}
                             </Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>{ingredient.strength || 'Not specified'}</TableCell>
-                        <TableCell>{ingredient.unit || 'Not specified'}</TableCell>
-                        <TableCell>{ingredient.source || 'Not specified'}</TableCell>
-                        <TableCell>{ingredient.supplier || 'Not specified'}</TableCell>
-                      </TableRow>
-                    ))}
+                            {ingredient.name !== ingredient.commonName && (
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                {ingredient.name}
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell>{ingredient.quantity?.value || 'Not specified'}</TableCell>
+                          <TableCell>{ingredient.quantity?.unit || 'Not specified'}</TableCell>
+                          <TableCell>{ingredient.equivalentTo?.substance || 'Not specified'}</TableCell>
+                          <TableCell>{supplier.supplier || 'Not specified'}</TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -305,8 +314,13 @@ const PublicProductDetail = () => {
                   Manufacturing Site
                 </Typography>
                 <Typography variant="body2">
-                  {artgEntry.manufacturingSite || 'Not specified'}
+                  {manufacturingDetails.manufacturer || 'Not specified'}
                 </Typography>
+                {manufacturingDetails.manufacturerAddress && (
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {manufacturingDetails.manufacturerAddress}
+                  </Typography>
+                )}
               </Grid>
               
               <Grid item xs={12} md={6}>
@@ -332,7 +346,7 @@ const PublicProductDetail = () => {
                   {excipients.map((excipient, index) => (
                     <Chip 
                       key={index}
-                      label={excipient.ingredientName}
+                      label={excipient.name}
                       variant="outlined"
                       size="small"
                     />
@@ -351,20 +365,22 @@ const PublicProductDetail = () => {
               Health Claims & Scientific Evidence
             </Typography>
             
-            {artgEntry.indications && artgEntry.indications.length > 0 ? (
+            {permittedIndications && permittedIndications.length > 0 ? (
               <Box>
                 <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                   Permitted Indications
                 </Typography>
                 <List>
-                  {artgEntry.indications.map((indication, index) => (
+                  {permittedIndications.map((indication, index) => (
                     <ListItem key={index} sx={{ pl: 0 }}>
                       <ListItemIcon>
                         <CheckCircleIcon color="primary" />
                       </ListItemIcon>
                       <ListItemText 
-                        primary={indication}
+                        primary={indication.text || indication}
+                        secondary={indication.evidenceNotes}
                         primaryTypographyProps={{ variant: 'body2' }}
+                        secondaryTypographyProps={{ variant: 'caption' }}
                       />
                     </ListItem>
                   ))}
@@ -400,14 +416,18 @@ const PublicProductDetail = () => {
                 <Typography variant="subtitle1">Warnings and Precautions</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {artgEntry.warnings && artgEntry.warnings.length > 0 ? (
+                {warnings && warnings.length > 0 ? (
                   <List>
-                    {artgEntry.warnings.map((warning, index) => (
+                    {warnings.map((warning, index) => (
                       <ListItem key={index} sx={{ pl: 0 }}>
                         <ListItemIcon>
                           <WarningIcon color="warning" />
                         </ListItemIcon>
-                        <ListItemText primary={warning} />
+                        <ListItemText primary={
+                          typeof warning === 'string' 
+                            ? warning 
+                            : warning?.text || warning?.warning || 'Warning information not available'
+                        } />
                       </ListItem>
                     ))}
                   </List>
@@ -425,8 +445,18 @@ const PublicProductDetail = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2">
-                  {artgEntry.directions || 'Follow label directions or consult healthcare provider.'}
+                  <strong>Adults:</strong> {dosageInfo.adults || 'Follow label directions or consult healthcare provider.'}
                 </Typography>
+                {dosageInfo.children && (
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    <strong>Children:</strong> {dosageInfo.children}
+                  </Typography>
+                )}
+                {dosageInfo.generalNotes && (
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    <strong>Notes:</strong> {dosageInfo.generalNotes}
+                  </Typography>
+                )}
               </AccordionDetails>
             </Accordion>
 
@@ -436,8 +466,13 @@ const PublicProductDetail = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <Typography variant="body2">
-                  {artgEntry.storageConditions || 'Store in a cool, dry place away from direct sunlight.'}
+                  {osiData.storageShelfLife?.storageConditions || 'Store in a cool, dry place away from direct sunlight.'}
                 </Typography>
+                {osiData.storageShelfLife?.useByInstructions && (
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    <strong>After Opening:</strong> {osiData.storageShelfLife.useByInstructions}
+                  </Typography>
+                )}
               </AccordionDetails>
             </Accordion>
           </CardContent>

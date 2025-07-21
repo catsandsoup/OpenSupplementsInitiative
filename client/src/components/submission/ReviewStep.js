@@ -210,8 +210,12 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
             {data.permittedIndications.map((indication, index) => (
               <ListItem key={index} divider>
                 <ListItemText
-                  primary={indication.text}
-                  secondary={indication.evidenceNotes}
+                  primary={
+                    typeof indication === 'string' 
+                      ? indication 
+                      : indication?.text || 'Health claim information not available'
+                  }
+                  secondary={indication?.evidenceNotes}
                 />
               </ListItem>
             ))}
@@ -232,12 +236,18 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
               {data.warnings.map((warning, index) => (
                 <ListItem key={index} divider>
                   <ListItemText
-                    primary={warning.text}
+                    primary={
+                      typeof warning === 'string' 
+                        ? warning 
+                        : warning?.text || warning?.warning || 'Warning information not available'
+                    }
                     secondary={
-                      <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                        <Chip label={warning.type} size="small" />
-                        <Chip label={warning.source} size="small" variant="outlined" />
-                      </Box>
+                      typeof warning === 'object' && (
+                        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                          <Chip label={warning.type || 'General'} size="small" />
+                          <Chip label={warning.source || 'Unknown'} size="small" variant="outlined" />
+                        </Box>
+                      )
                     }
                   />
                 </ListItem>

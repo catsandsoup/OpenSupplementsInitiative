@@ -51,6 +51,14 @@
   "standardIndications": "No Standard Indications included on Record",
   "specificIndications": "No Specific Indications included on Record",
   "warnings": [
+    "Always read the label and follow the directions for use",
+    "If symptoms persist, talk to your health professional",
+    "Contains milk products",
+    "Not recommended for severely immunocompromised individuals",
+    "Discontinue use if adverse reactions occur",
+    "Store in refrigerator after opening to maintain potency"
+  ],
+  "structuredWarnings": [
     {
       "text": "Always read the label and follow the directions for use",
       "type": "MandatoryLabel",
@@ -97,7 +105,123 @@
     "packSizeInformation": {
       "packSize": "30 Capsules (1 month supply)",
       "poisonSchedule": null
-    }
+    },
+    "manufacturingDetails": {
+      "manufacturer": "BioWellness Manufacturing Pty Ltd",
+      "manufacturerAddress": "789 Pharmaceutical Drive, Melbourne VIC 3000, Australia",
+      "gmpCertificate": "GMP-AU-2024-BWM-001",
+      "batchNumber": "PBC240315001",
+      "manufacturingDate": "2024-03-15",
+      "expiryDate": "2026-03-15",
+      "qualityStandards": ["TGA GMP", "ISO 22000", "HACCP"],
+      "facilityLicense": "TGA-MAN-12345"
+    },
+    "supplierDetails": [
+      {
+        "ingredient": "Lactobacillus acidophilus",
+        "supplier": "Probiotic Cultures International",
+        "supplierAddress": "456 Biotech Boulevard, Brisbane QLD 4000, Australia",
+        "coa": "COA-LA-240315-001",
+        "purityTest": "≥10 billion CFU/g, Identity confirmed by 16S rRNA sequencing",
+        "certifications": ["Organic Certified", "Non-GMO Verified"]
+      },
+      {
+        "ingredient": "Bifidobacterium lactis",
+        "supplier": "Probiotic Cultures International", 
+        "supplierAddress": "456 Biotech Boulevard, Brisbane QLD 4000, Australia",
+        "coa": "COA-BL-240315-001",
+        "purityTest": "≥8 billion CFU/g, Strain identity verified",
+        "certifications": ["Organic Certified", "Non-GMO Verified"]
+      },
+      {
+        "ingredient": "Lactobacillus plantarum",
+        "supplier": "Australian Fermentation Technologies",
+        "supplierAddress": "123 Microbiology Street, Adelaide SA 5000, Australia",
+        "coa": "COA-LP-240315-001", 
+        "purityTest": "≥5 billion CFU/g, Viability >95%",
+        "certifications": ["GMP Certified", "Kosher Certified"]
+      },
+      {
+        "ingredient": "Bifidobacterium longum",
+        "supplier": "Australian Fermentation Technologies",
+        "supplierAddress": "123 Microbiology Street, Adelaide SA 5000, Australia",
+        "coa": "COA-BLO-240315-001",
+        "purityTest": "≥3 billion CFU/g, Genetic stability confirmed",
+        "certifications": ["GMP Certified", "Kosher Certified"]
+      },
+      {
+        "ingredient": "Lactobacillus rhamnosus",
+        "supplier": "BioActive Ingredients Ltd",
+        "supplierAddress": "321 Research Park Drive, Perth WA 6000, Australia",
+        "coa": "COA-LR-240315-001",
+        "purityTest": "≥2 billion CFU/g, Antibiotic resistance profile verified",
+        "certifications": ["Organic Certified", "Halal Certified"]
+      },
+      {
+        "ingredient": "Inulin (Prebiotic Fiber)",
+        "supplier": "Natural Fiber Solutions",
+        "supplierAddress": "789 Agricultural Way, Toowoomba QLD 4350, Australia",
+        "coa": "COA-IN-240315-001",
+        "purityTest": "≥95% purity, Degree of polymerization 10-60",
+        "certifications": ["Organic Certified", "Non-GMO Verified", "Vegan Certified"]
+      },
+      {
+        "ingredient": "Enteric Coating Material",
+        "supplier": "Pharmaceutical Coatings Australia",
+        "supplierAddress": "567 Industrial Estate, Sydney NSW 2000, Australia",
+        "coa": "COA-EC-240315-001",
+        "purityTest": "USP/EP grade, Dissolution profile verified",
+        "certifications": ["Pharmaceutical Grade", "Halal Certified"]
+      }
+    ],
+    "clinicalEvidence": [
+      {
+        "study": "Multi-strain Probiotic Efficacy in Digestive Health",
+        "doi": "10.1234/probiotics.2023.001",
+        "summary": "Double-blind RCT (n=120) showing 28-day supplementation improved digestive comfort scores by 65% vs placebo",
+        "studyType": "Randomized Controlled Trial",
+        "duration": "28 days",
+        "participants": 120,
+        "primaryEndpoint": "Digestive comfort score improvement"
+      },
+      {
+        "study": "Immune Function Enhancement with Probiotic Supplementation",
+        "doi": "10.1234/immunology.2023.002",
+        "summary": "12-week study (n=200) demonstrated 23% reduction in upper respiratory infections",
+        "studyType": "Randomized Controlled Trial", 
+        "duration": "12 weeks",
+        "participants": 200,
+        "primaryEndpoint": "Incidence of upper respiratory tract infections"
+      },
+      {
+        "study": "Gut Microbiome Diversity Analysis",
+        "doi": "10.1234/microbiome.2023.003",
+        "summary": "16S rRNA sequencing showed 340% increase in beneficial bacteria diversity after 4 weeks",
+        "studyType": "Microbiome Analysis",
+        "duration": "4 weeks", 
+        "participants": 80,
+        "primaryEndpoint": "Gut microbiome diversity index"
+      }
+    ],
+    "regulatoryCompliance": {
+      "tgaListingNumber": "AUST L 456789",
+      "registrationDate": "2024-03-15",
+      "lastReviewDate": "2024-07-15",
+      "complianceStatus": "Fully Compliant",
+      "regulatoryNotes": "Product meets all TGA requirements for listed medicines. Annual compliance review completed.",
+      "labelApproval": "TGA-LABEL-456789-2024"
+    },
+    "productDescription": "ProBiotic Complete Advanced Formula is a premium multi-strain probiotic supplement containing 28 billion CFU of five clinically studied probiotic strains. Each enteric-coated capsule is designed to survive stomach acid and deliver live beneficial bacteria directly to the intestines. Enhanced with prebiotic inulin fiber to support probiotic growth and colonization. Manufactured in a TGA-certified GMP facility using pharmaceutical-grade ingredients sourced from certified Australian suppliers.",
+    "targetMarket": "Adults and adolescents seeking to maintain digestive health, support immune function, and promote beneficial gut flora balance",
+    "competitiveAdvantages": [
+      "Multi-strain formula with clinically proven strains",
+      "High potency 28 billion CFU per capsule",
+      "Enteric coating for enhanced survival and delivery",
+      "Added prebiotic fiber for synbiotic effect",
+      "Manufactured in Australia to pharmaceutical standards",
+      "Comprehensive clinical evidence base",
+      "Refrigerated storage for maximum potency"
+    ]
   },
   "components": [
     {
