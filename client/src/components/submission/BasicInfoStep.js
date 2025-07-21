@@ -142,12 +142,10 @@ const BasicInfoStep = ({ data, updateData, onNext }) => {
   };
 
   const isFormValid = () => {
+    // More lenient validation - only require product name and dosage form
     return (
-      safeData.artgEntry.productName.trim() &&
-      safeData.artgEntry.sponsor.trim() &&
-      safeData.products[0].productName.trim() &&
-      safeData.components[0].dosageForm.trim() &&
-      safeData.dosageInformation.adults.trim()
+      safeData.artgEntry.productName && safeData.artgEntry.productName.trim() &&
+      safeData.components[0].dosageForm && safeData.components[0].dosageForm.trim()
     );
   };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { useAuth } from './contexts/AuthContext';
-import Navbar from './components/Navbar';
+import ResponsiveNavbar from './components/ResponsiveNavbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -14,6 +14,8 @@ import PublicCatalog from './pages/PublicCatalog';
 import PublicProductDetail from './pages/PublicProductDetail';
 import CertificateVerification from './pages/CertificateVerification';
 import Profile from './pages/Profile';
+import DemoControlPanel from './pages/DemoControlPanel';
+import SystemHealthDashboard from './pages/SystemHealthDashboard';
 import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
@@ -25,8 +27,8 @@ function App() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <ResponsiveNavbar />
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
         <Routes>
           {/* Public routes */}
           <Route path="/catalog" element={<PublicCatalog />} />
@@ -55,6 +57,14 @@ function App() {
           <Route 
             path="/admin/review/:id" 
             element={user?.role === 'admin' ? <AdminReviewPage /> : <Navigate to="/dashboard" />} 
+          />
+          <Route 
+            path="/admin/demo" 
+            element={user?.role === 'admin' ? <DemoControlPanel /> : <Navigate to="/dashboard" />} 
+          />
+          <Route 
+            path="/admin/health" 
+            element={user?.role === 'admin' ? <SystemHealthDashboard /> : <Navigate to="/dashboard" />} 
           />
           <Route 
             path="/supplement/new" 

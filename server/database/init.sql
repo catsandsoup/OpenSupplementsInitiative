@@ -69,7 +69,6 @@ CREATE TABLE certificates (
     expires_at TIMESTAMP NOT NULL,
     revoked_at TIMESTAMP,
     revocation_reason TEXT,
-    qr_code_url VARCHAR(500),
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -103,6 +102,17 @@ CREATE TABLE audit_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Certificate verification history table
+CREATE TABLE certificate_verifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    osi_number VARCHAR(50) NOT NULL,
+    certificate_id UUID REFERENCES certificates(id),
+    verification_result VARCHAR(20) NOT NULL CHECK (verification_result IN ('valid', 'expired', 'revoked', 'not_found')),
+    ip_address INET,
+    user_agent TEXT,
+    verified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_supplements_status ON supplements(status);
 CREATE INDEX idx_supplements_organization ON supplements(organization_id);
@@ -113,6 +123,8 @@ CREATE INDEX idx_documents_type ON documents(document_type);
 CREATE INDEX idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_certificate_verifications_osi ON certificate_verifications(osi_number);
+CREATE INDEX idx_certificate_verifications_date ON certificate_verifications(verified_at);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()

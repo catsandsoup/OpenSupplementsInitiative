@@ -17,27 +17,42 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Tooltip
+  Tooltip,
+  useTheme,
+  useMediaQuery,
+  Fade,
+  Skeleton
 } from '@mui/material';
 import {
   Add as AddIcon,
   Visibility as ViewIcon,
   Edit as EditIcon,
   Send as SendIcon,
-  Business as BusinessIcon
+  Business as BusinessIcon,
+  TrendingUp as TrendingUpIcon,
+  Schedule as ScheduleIcon,
+  CheckCircle as CheckCircleIcon,
+  Description as DraftIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../components/ToastProvider';
 import api from '../utils/api';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner, { ProductCardSkeleton, TableSkeleton } from '../components/LoadingSpinner';
 import OrganizationSetup from '../components/OrganizationSetup';
+import HelpTooltip, { FieldHelpTooltip, StatusIndicator } from '../components/HelpTooltip';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { showSuccess, showError, showInfo } = useToast();
+  
   const [supplements, setSupplements] = useState([]);
   const [organization, setOrganization] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(null);
   const [error, setError] = useState('');
   const [showOrgSetup, setShowOrgSetup] = useState(false);
 
@@ -107,12 +122,16 @@ const Dashboard = () => {
   };
 
   const handleSubmitForReview = async (supplementId) => {
+    setSubmitting(supplementId);
     try {
       await api.post(`/supplements/${supplementId}/submit`);
-      fetchSupplements(); // Refresh the list
+      await fetchSupplements(); // Refresh the list
+      showSuccess('Product submitted for review successfully!');
     } catch (error) {
       console.error('Error submitting supplement:', error);
-      setError('Failed to submit supplement for review');
+      showError('Failed to submit supplement for review. Please try again.');
+    } finally {
+      setSubmitting(null);
     }
   };
 
@@ -179,52 +198,92 @@ const Dashboard = () => {
         {/* Stats Cards */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="text.secondary" gutterBottom>
-                  Total Products
-                </Typography>
-                <Typography variant="h4">
-                  {supplements.length}
-                </Typography>
-              </CardContent>
-            </Card>
+            <Fade in timeout={300}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <TrendingUpIcon sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography color="text.secondary" variant="subtitle2" fontWeight={600}>
+                      Total Products
+                    </Typography>
+                    <HelpTooltip
+                      title="Total Products"
+                      description="Total number of products you've created in the system"
+                      placement="top"
+                    />
+                  </Box>
+                  <Typography variant="h3" fontWeight="bold" color="primary.main">
+                    {supplements.length}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Fade>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="text.secondary" gutterBottom>
-                  Approved
-                </Typography>
-                <Typography variant="h4" color="success.main">
-                  {supplements.filter(s => s.status === 'approved').length}
-                </Typography>
-              </CardContent>
-            </Card>
+            <Fade in timeout={400}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
+                    <Typography color="text.secondary" variant="subtitle2" fontWeight={600}>
+                      Approved
+                    </Typography>
+                    <HelpTooltip
+                      title="Approved Products"
+                      description="Products that have been reviewed and approved for OSI certification"
+                      placement="top"
+                    />
+                  </Box>
+                  <Typography variant="h3" fontWeight="bold" color="success.main">
+                    {supplements.filter(s => s.status === 'approved').length}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Fade>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="text.secondary" gutterBottom>
-                  Under Review
-                </Typography>
-                <Typography variant="h4" color="warning.main">
-                  {supplements.filter(s => s.status === 'under_review' || s.status === 'submitted').length}
-                </Typography>
-              </CardContent>
-            </Card>
+            <Fade in timeout={500}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <ScheduleIcon sx={{ mr: 1, color: 'warning.main' }} />
+                    <Typography color="text.secondary" variant="subtitle2" fontWeight={600}>
+                      Under Review
+                    </Typography>
+                    <HelpTooltip
+                      title="Under Review"
+                      description="Products currently being reviewed by OSI administrators"
+                      placement="top"
+                    />
+                  </Box>
+                  <Typography variant="h3" fontWeight="bold" color="warning.main">
+                    {supplements.filter(s => s.status === 'under_review' || s.status === 'submitted').length}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Fade>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="text.secondary" gutterBottom>
-                  Drafts
-                </Typography>
-                <Typography variant="h4" color="text.secondary">
-                  {supplements.filter(s => s.status === 'draft').length}
-                </Typography>
-              </CardContent>
-            </Card>
+            <Fade in timeout={600}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <DraftIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                    <Typography color="text.secondary" variant="subtitle2" fontWeight={600}>
+                      Drafts
+                    </Typography>
+                    <HelpTooltip
+                      title="Draft Products"
+                      description="Products that are still being prepared and haven't been submitted yet"
+                      placement="top"
+                    />
+                  </Box>
+                  <Typography variant="h3" fontWeight="bold" color="text.secondary">
+                    {supplements.filter(s => s.status === 'draft').length}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Fade>
           </Grid>
         </Grid>
 
@@ -236,63 +295,198 @@ const Dashboard = () => {
             </Typography>
             
             {supplements.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography variant="body1" color="text.secondary" gutterBottom>
-                  You haven't submitted any products yet.
+              <Box sx={{ textAlign: 'center', py: 6 }}>
+                <Box sx={{ mb: 3 }}>
+                  <BusinessIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                </Box>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No products yet
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
+                  Start your OSI certification journey by submitting your first product for review.
                 </Typography>
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={() => navigate('/supplement/new')}
+                  size="large"
                 >
                   Submit Your First Product
                 </Button>
               </Box>
-            ) : (
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Product Name</TableCell>
-                      <TableCell>ARTG Number</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Submitted</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {supplements.map((supplement) => (
-                      <TableRow key={supplement.id}>
-                        <TableCell>
-                          <Typography variant="body2" fontWeight="medium">
-                            {supplement.osi_data?.artgEntry?.productName || 'Unnamed Product'}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {supplement.organization_name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          {supplement.osi_data?.artgEntry?.artgNumber || 'Not set'}
-                        </TableCell>
-                        <TableCell>
+            ) : isMobile ? (
+              // Mobile Card View
+              <Grid container spacing={2}>
+                {supplements.map((supplement) => (
+                  <Grid item xs={12} key={supplement.id}>
+                    <Card variant="outlined" sx={{ position: 'relative' }}>
+                      <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                              {supplement.osi_data?.artgEntry?.productName || 'Unnamed Product'}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              {supplement.organization_name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              ARTG: {supplement.osi_data?.artgEntry?.artgNumber || 'Not set'}
+                            </Typography>
+                          </Box>
+                          <StatusIndicator
+                            status={supplement.status}
+                            title={getStatusLabel(supplement.status)}
+                            description={`Product is currently ${supplement.status}`}
+                          />
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Chip
                             label={getStatusLabel(supplement.status)}
                             color={getStatusColor(supplement.status)}
                             size="small"
                           />
+                          <Typography variant="caption" color="text.secondary">
+                            {supplement.submitted_at 
+                              ? `Submitted ${new Date(supplement.submitted_at).toLocaleDateString()}`
+                              : 'Not submitted'
+                            }
+                          </Typography>
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', gap: 1, mt: 2, justifyContent: 'flex-end' }}>
+                          <Button
+                            size="small"
+                            startIcon={<ViewIcon />}
+                            onClick={() => navigate(`/supplement/${supplement.id}`)}
+                          >
+                            View
+                          </Button>
+                          
+                          {supplement.status === 'draft' && (
+                            <>
+                              <Button
+                                size="small"
+                                startIcon={<EditIcon />}
+                                onClick={() => navigate(`/supplement/${supplement.id}/edit`)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                size="small"
+                                variant="contained"
+                                startIcon={submitting === supplement.id ? <LoadingSpinner size={16} /> : <SendIcon />}
+                                onClick={() => handleSubmitForReview(supplement.id)}
+                                disabled={submitting === supplement.id}
+                              >
+                                {submitting === supplement.id ? 'Submitting...' : 'Submit'}
+                              </Button>
+                            </>
+                          )}
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              // Desktop Table View
+              <TableContainer component={Paper} variant="outlined">
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          Product Name
+                          <HelpTooltip
+                            title="Product Information"
+                            description="Product name and organization details"
+                            size="small"
+                          />
+                        </Box>
+                      </TableCell>
+                      <TableCell>ARTG Number</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          Status
+                          <HelpTooltip
+                            title="Certification Status"
+                            description="Current status of your product in the OSI certification process"
+                            size="small"
+                          />
+                        </Box>
+                      </TableCell>
+                      <TableCell>Submitted</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {supplements.map((supplement) => (
+                      <TableRow 
+                        key={supplement.id}
+                        sx={{ 
+                          '&:hover': { 
+                            backgroundColor: theme.palette.action.hover 
+                          } 
+                        }}
+                      >
+                        <TableCell>
+                          <Box>
+                            <Typography variant="body2" fontWeight="medium">
+                              {supplement.osi_data?.artgEntry?.productName || 'Unnamed Product'}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {supplement.organization_name}
+                            </Typography>
+                          </Box>
                         </TableCell>
                         <TableCell>
-                          {supplement.submitted_at 
-                            ? new Date(supplement.submitted_at).toLocaleDateString()
-                            : 'Not submitted'
-                          }
+                          <Typography variant="body2">
+                            {supplement.osi_data?.artgEntry?.artgNumber || (
+                              <span style={{ color: theme.palette.text.secondary, fontStyle: 'italic' }}>
+                                Not set
+                              </span>
+                            )}
+                          </Typography>
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <StatusIndicator
+                              status={supplement.status}
+                              title={getStatusLabel(supplement.status)}
+                              description={`Product is currently ${supplement.status}`}
+                              size="small"
+                            />
+                            <Chip
+                              label={getStatusLabel(supplement.status)}
+                              color={getStatusColor(supplement.status)}
+                              size="small"
+                            />
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {supplement.submitted_at 
+                              ? new Date(supplement.submitted_at).toLocaleDateString()
+                              : (
+                                <span style={{ color: theme.palette.text.secondary, fontStyle: 'italic' }}>
+                                  Not submitted
+                                </span>
+                              )
+                            }
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                             <Tooltip title="View Details">
                               <IconButton
                                 size="small"
                                 onClick={() => navigate(`/supplement/${supplement.id}`)}
+                                sx={{ 
+                                  '&:hover': { 
+                                    backgroundColor: theme.palette.primary.main + '10' 
+                                  } 
+                                }}
                               >
                                 <ViewIcon />
                               </IconButton>
@@ -300,10 +494,15 @@ const Dashboard = () => {
                             
                             {supplement.status === 'draft' && (
                               <>
-                                <Tooltip title="Edit">
+                                <Tooltip title="Edit Product">
                                   <IconButton
                                     size="small"
                                     onClick={() => navigate(`/supplement/${supplement.id}/edit`)}
+                                    sx={{ 
+                                      '&:hover': { 
+                                        backgroundColor: theme.palette.info.main + '10' 
+                                      } 
+                                    }}
                                   >
                                     <EditIcon />
                                   </IconButton>
@@ -313,8 +512,18 @@ const Dashboard = () => {
                                     size="small"
                                     color="primary"
                                     onClick={() => handleSubmitForReview(supplement.id)}
+                                    disabled={submitting === supplement.id}
+                                    sx={{ 
+                                      '&:hover': { 
+                                        backgroundColor: theme.palette.success.main + '10' 
+                                      } 
+                                    }}
                                   >
-                                    <SendIcon />
+                                    {submitting === supplement.id ? (
+                                      <LoadingSpinner size={16} />
+                                    ) : (
+                                      <SendIcon />
+                                    )}
                                   </IconButton>
                                 </Tooltip>
                               </>

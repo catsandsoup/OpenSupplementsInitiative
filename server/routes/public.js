@@ -80,7 +80,7 @@ router.get('/supplements/:id', async (req, res) => {
 
     const result = await query(`
       SELECT s.id, s.osi_data, c.osi_number, c.issued_at, c.expires_at, c.status as cert_status,
-             c.qr_code_url, o.legal_name as organization_name, o.trading_name,
+             o.legal_name as organization_name, o.trading_name,
              o.address_line1, o.city, o.state, o.country
       FROM supplements s
       INNER JOIN certificates c ON s.id = c.supplement_id
@@ -107,8 +107,8 @@ router.get('/verify/:osiNumber', async (req, res) => {
     const { osiNumber } = req.params;
 
     const result = await query(`
-      SELECT c.osi_number, c.issued_at, c.expires_at, c.status, c.revoked_at, c.revocation_reason,
-             s.osi_data->>'artgEntry'->>'productName' as product_name,
+      SELECT c.id, c.osi_number, c.issued_at, c.expires_at, c.status, c.revoked_at, c.revocation_reason,
+             s.osi_data->'artgEntry'->>'productName' as product_name,
              o.legal_name as organization_name, o.trading_name
       FROM certificates c
       LEFT JOIN supplements s ON c.supplement_id = s.id
@@ -116,10 +116,47 @@ router.get('/verify/:osiNumber', async (req, res) => {
       WHERE c.osi_number = $1
     `, [osiNumber]);
 
+    let verificationResult;
+    let certificateId = null;
+
+    if (result.rows.length === 0) {
+      verificationResult = 'not_found';
+    } else {
+      const certificate = result.rows[0];
+      certificateId = certificate.id;
+      const now = new Date();
+      const expiresAt = new Date(certificate.expires_at);
+      
+      if (certificate.status === 'active' && expiresAt > now) {
+        verificationResult = 'valid';
+      } else if (certificate.status === 'expired' || expiresAt <= now) {
+        verificationResult = 'expired';
+      } else if (certificate.status === 'revoked') {
+        verificationResult = 'revoked';
+      }
+    }
+
+    // Log verification attempt for audit purposes
+    try {
+      const clientIp = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 
+                      (req.connection.socket ? req.connection.socket.remoteAddress : null);
+      const userAgent = req.get('User-Agent') || '';
+
+      await query(`
+        INSERT INTO certificate_verifications (osi_number, certificate_id, verification_result, ip_address, user_agent)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [osiNumber, certificateId, verificationResult, clientIp, userAgent]);
+    } catch (logError) {
+      console.error('Error logging verification:', logError);
+      // Don't fail the verification if logging fails
+    }
+
     if (result.rows.length === 0) {
       return res.status(404).json({ 
         error: 'Certificate not found',
-        valid: false
+        valid: false,
+        status: 'not_found',
+        message: 'Certificate not found'
       });
     }
 
@@ -157,6 +194,99 @@ router.get('/verify/:osiNumber', async (req, res) => {
     });
   } catch (error) {
     console.error('Verify certificate error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/public/certificates/:osiNumber/download - Download certificate PDF by OSI number (public access)
+router.get('/certificates/:osiNumber/download', async (req, res) => {
+  try {
+    const { osiNumber } = req.params;
+
+    // Get certificate with supplement data
+    const result = await query(`
+      SELECT c.*, s.osi_data, s.status as supplement_status,
+             o.legal_name as organization_name, o.trading_name,
+             o.address_line1, o.city, o.state, o.country
+      FROM certificates c
+      LEFT JOIN supplements s ON c.supplement_id = s.id
+      LEFT JOIN organizations o ON s.organization_id = o.id
+      WHERE c.osi_number = $1 AND c.status = 'active'
+    `, [osiNumber]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Certificate not found' });
+    }
+
+    const certificate = result.rows[0];
+    const certData = JSON.parse(certificate.certificate_data);
+    const osiData = certificate.osi_data;
+
+    // Create PDF document
+    const PDFDocument = require('pdfkit');
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    
+    // Set response headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="OSI-Certificate-${certData.osiNumber}.pdf"`);
+    
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Add OSI header
+    doc.fontSize(24).fillColor('#1976d2').text('Open Supplements Initiative', 50, 50);
+    doc.fontSize(18).fillColor('#666').text('Certificate of Authenticity', 50, 80);
+    
+    // Add certificate number
+    doc.fontSize(14).fillColor('#000').text(`Certificate Number: ${certData.osiNumber}`, 50, 120);
+    
+    // Add product information
+    doc.fontSize(16).fillColor('#1976d2').text('Product Information', 50, 160);
+    doc.fontSize(12).fillColor('#000')
+       .text(`Product Name: ${certData.productName}`, 50, 185)
+       .text(`Manufacturer: ${certData.organizationName}`, 50, 205)
+       .text(`Dosage Form: ${osiData.components?.[0]?.dosageForm || 'Not specified'}`, 50, 225)
+       .text(`Route of Administration: ${osiData.components?.[0]?.routeOfAdministration || 'Not specified'}`, 50, 245);
+
+    // Add active ingredients
+    if (osiData.components?.[0]?.activeIngredients?.length > 0) {
+      doc.fontSize(16).fillColor('#1976d2').text('Active Ingredients', 50, 285);
+      let yPos = 310;
+      osiData.components[0].activeIngredients.forEach((ingredient, index) => {
+        doc.fontSize(12).fillColor('#000')
+           .text(`${index + 1}. ${ingredient.commonName || ingredient.name}`, 50, yPos)
+           .text(`   Quantity: ${ingredient.quantity?.value || ''} ${ingredient.quantity?.unit || ''}`, 50, yPos + 15);
+        yPos += 35;
+      });
+    }
+
+    // Add certificate details
+    const certYPos = Math.max(450, 310 + (osiData.components?.[0]?.activeIngredients?.length || 0) * 35);
+    doc.fontSize(16).fillColor('#1976d2').text('Certificate Details', 50, certYPos);
+    doc.fontSize(12).fillColor('#000')
+       .text(`Issued Date: ${new Date(certData.issuedDate).toLocaleDateString()}`, 50, certYPos + 25)
+       .text(`Expires Date: ${new Date(certData.expiresDate).toLocaleDateString()}`, 50, certYPos + 45)
+       .text(`Status: ${certificate.status.toUpperCase()}`, 50, certYPos + 65)
+       .text(`Digital Signature: ${certificate.digital_signature.substring(0, 32)}...`, 50, certYPos + 85);
+
+    // Add verification instructions
+    const verifyYPos = certYPos + 120;
+    doc.fontSize(14).fillColor('#1976d2').text('Certificate Verification', 50, verifyYPos);
+    doc.fontSize(10).fillColor('#666')
+       .text('To verify this certificate, visit:', 50, verifyYPos + 20)
+       .text(certData.verificationUrl, 50, verifyYPos + 35)
+       .text(`Or enter OSI number: ${certData.osiNumber}`, 50, verifyYPos + 50);
+
+    // Add footer
+    doc.fontSize(10).fillColor('#666')
+       .text('This certificate is cryptographically signed and can be verified at verify.osi.org', 50, 750)
+       .text('© Open Supplements Initiative - Ensuring supplement transparency and trust', 50, 765);
+
+    // Finalize PDF
+    doc.end();
+
+  } catch (error) {
+    console.error('Download public certificate error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

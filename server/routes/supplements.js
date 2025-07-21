@@ -203,9 +203,41 @@ router.put('/:id', authenticateToken, requireAdminOrManufacturer, async (req, re
       return res.status(404).json({ error: 'Supplement not found or access denied' });
     }
 
+    const updatedSupplement = result.rows[0];
+
+    // Auto-generate certificate when supplement is approved
+    if (status === 'approved' && req.user.role === 'admin') {
+      try {
+        // Check if certificate already exists
+        const existingCert = await query(
+          'SELECT id FROM certificates WHERE supplement_id = $1 AND status = $2',
+          [id, 'active']
+        );
+
+        if (existingCert.rows.length === 0) {
+          // Generate certificate automatically
+          const certificateResponse = await fetch(`${process.env.API_BASE_URL || 'http://localhost:3001'}/api/certificates`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': req.headers.authorization
+            },
+            body: JSON.stringify({ supplementId: id })
+          });
+
+          if (certificateResponse.ok) {
+            console.log(`Certificate generated automatically for supplement ${id}`);
+          }
+        }
+      } catch (certError) {
+        console.error('Error auto-generating certificate:', certError);
+        // Don't fail the supplement update if certificate generation fails
+      }
+    }
+
     res.json({
       message: 'Supplement updated successfully',
-      supplement: result.rows[0]
+      supplement: updatedSupplement
     });
   } catch (error) {
     console.error('Update supplement error:', error);

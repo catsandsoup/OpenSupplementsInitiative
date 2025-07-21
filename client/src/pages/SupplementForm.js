@@ -174,55 +174,165 @@ const SupplementForm = () => {
   const saveDraft = async () => {
     try {
       setLoading(true);
+      setError('');
       
       // Prepare data for draft submission - make it more lenient
       const draftData = {
         ...formData,
         // Ensure required fields have default values for draft
         artgEntry: {
-          ...formData.artgEntry,
-          artgNumber: formData.artgEntry.artgNumber || 'DRAFT-' + Date.now(),
-          status: 'Draft'
+          productName: formData.artgEntry?.productName || '',
+          alternateNames: formData.artgEntry?.alternateNames || [],
+          sponsor: formData.artgEntry?.sponsor || '',
+          postalAddress: formData.artgEntry?.postalAddress || '',
+          productCategory: formData.artgEntry?.productCategory || 'Medicine',
+          status: 'Draft',
+          artgNumber: formData.artgEntry?.artgNumber || `DRAFT-${Date.now()}`,
+          ...formData.artgEntry
         },
-        // Convert warnings objects to strings for schema compliance
-        warnings: (formData.warnings || []).map(w => typeof w === 'object' ? w.text || w : w),
+        // Ensure products array exists
+        products: formData.products || [{
+          productName: formData.artgEntry?.productName || '',
+          alternateNames: [],
+          productType: 'Single Medicine Product',
+          effectiveDate: new Date().toISOString().split('T')[0]
+        }],
+        // Convert warnings to simple strings
+        warnings: (formData.warnings || []).map(w => {
+          if (typeof w === 'string') return w;
+          if (typeof w === 'object') return w.text || w.warning || JSON.stringify(w);
+          return String(w);
+        }),
         // Ensure components have proper structure
         components: (formData.components || []).map(comp => ({
-          ...comp,
+          formulation: comp.formulation || 'Primary',
+          dosageForm: comp.dosageForm || '',
+          routeOfAdministration: comp.routeOfAdministration || '',
+          visualIdentification: comp.visualIdentification || '',
           activeIngredients: (comp.activeIngredients || []).map(ing => ({
-            ...ing,
-            // Convert quantity object to string for schema compliance
+            substance: ing.substance || '',
             quantity: typeof ing.quantity === 'object' 
               ? `${ing.quantity.value || ''} ${ing.quantity.unit || ''}`.trim()
-              : ing.quantity || '',
-            // Remove equivalentTo if it's null or empty
+              : (ing.quantity || ''),
             ...(ing.equivalentTo && ing.equivalentTo.substance ? {
-              equivalentTo: `${ing.equivalentTo.value || ''} ${ing.equivalentTo.unit || ''} ${ing.equivalentTo.substance || ''}`.trim()
-            } : {})
+              equivalentTo: typeof ing.equivalentTo === 'object'
+                ? `${ing.equivalentTo.value || ''} ${ing.equivalentTo.unit || ''} ${ing.equivalentTo.substance || ''}`.trim()
+                : ing.equivalentTo
+            } : {}),
+            supplier: ing.supplier || '',
+            factory: ing.factory || '',
+            batchNumber: ing.batchNumber || '',
+            expiryDate: ing.expiryDate || ''
           })),
-          excipients: comp.excipients || []
+          excipients: (comp.excipients || []).map(exc => ({
+            substance: exc.substance || '',
+            quantity: typeof exc.quantity === 'object'
+              ? `${exc.quantity.value || ''} ${exc.quantity.unit || ''}`.trim()
+              : (exc.quantity || ''),
+            purpose: exc.purpose || ''
+          }))
         })),
+        // Ensure other required sections exist
+        permittedIndications: formData.permittedIndications || [],
+        indicationRequirements: formData.indicationRequirements || [],
+        dosageInformation: {
+          adults: '',
+          children: '',
+          generalNotes: '',
+          ...formData.dosageInformation
+        },
+        allergenInformation: {
+          containsAllergens: [],
+          freeOfClaims: [],
+          allergenStatement: '',
+          crossContaminationRisk: null,
+          ...formData.allergenInformation
+        },
+        additionalProductInformation: {
+          packSizeInformation: {
+            packSize: '',
+            poisonSchedule: '',
+            ...formData.additionalProductInformation?.packSizeInformation
+          },
+          ...formData.additionalProductInformation
+        },
+        storageShelfLife: {
+          storageConditions: '',
+          shelfLifeMonths: null,
+          useByInstructions: '',
+          batchNumberFormat: '',
+          expiryDateFormat: '',
+          ...formData.storageShelfLife
+        },
+        clinicalTrials: formData.clinicalTrials || [],
+        evidenceRegulatorySummary: {
+          overallEvidenceStatement: '',
+          keyRegulatoryPoints: [],
+          evidenceGradingSystemUsed: '',
+          references: [],
+          ...formData.evidenceRegulatorySummary
+        },
+        interactions: formData.interactions || [],
+        contraindicationsAdverseEffects: {
+          contraindications: [],
+          adverseEffects: [],
+          ...formData.contraindicationsAdverseEffects
+        },
+        intendedPopulation: {
+          primaryTargetGroups: [],
+          ageRange: {
+            minAge: null,
+            maxAge: null,
+            unit: 'years'
+          },
+          sex: 'Any',
+          specificConsiderations: '',
+          ...formData.intendedPopulation
+        },
+        productIdentifiers: formData.productIdentifiers || [],
+        documentInformation: {
+          dataEntrySource: 'Manufacturer Submission',
+          dataEntryDate: new Date().toISOString().split('T')[0],
+          version: '0.2.0',
+          notes: '',
+          ...formData.documentInformation
+        },
         submissionMetadata: {
-          ...formData.submissionMetadata,
+          submittedBy: user?.id || '',
+          organizationId: user?.organizationId || '',
+          status: 'draft',
           lastSaved: new Date().toISOString(),
-          status: 'draft'
+          submittedAt: null,
+          ...formData.submissionMetadata
         }
       };
 
       let response;
       if (id && id !== 'new') {
-        response = await api.put(`/supplements/${id}`, { osiData: draftData, status: 'draft' });
+        response = await api.put(`/supplements/${id}`, { 
+          osiData: draftData, 
+          status: 'draft' 
+        });
       } else {
         response = await api.post('/supplements', draftData);
       }
 
       setSuccess('Draft saved successfully');
+      
+      // Navigate to edit page if this was a new submission
       if (!id || id === 'new') {
-        navigate(`/supplement/${response.data.id}/edit`);
+        const supplementId = response.data.supplement?.id || response.data.id;
+        if (supplementId) {
+          navigate(`/supplement/${supplementId}/edit`);
+        }
       }
     } catch (err) {
       console.error('Save draft error:', err);
-      setError(err.response?.data?.error || 'Error saving draft');
+      const errorMessage = err.response?.data?.error || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          'Error saving draft. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

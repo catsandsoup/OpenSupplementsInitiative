@@ -1,0 +1,288 @@
+/* Presentation Mode Styles */
+/* Applied when presentation mode is enabled for better visibility during demos */
+
+.presentation-mode {
+  /* Increase base font sizes */
+  font-size: 18px !important;
+}
+
+.presentation-mode .MuiTypography-h1 {
+  font-size: 3.5rem !important;
+  font-weight: 700 !important;
+}
+
+.presentation-mode .MuiTypography-h2 {
+  font-size: 3rem !important;
+  font-weight: 700 !important;
+}
+
+.presentation-mode .MuiTypography-h3 {
+  font-size: 2.5rem !important;
+  font-weight: 600 !important;
+}
+
+.presentation-mode .MuiTypography-h4 {
+  font-size: 2rem !important;
+  font-weight: 600 !important;
+}
+
+.presentation-mode .MuiTypography-h5 {
+  font-size: 1.75rem !important;
+  font-weight: 600 !important;
+}
+
+.presentation-mode .MuiTypography-h6 {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.presentation-mode .MuiTypography-body1 {
+  font-size: 1.25rem !important;
+  line-height: 1.6 !important;
+}
+
+.presentation-mode .MuiTypography-body2 {
+  font-size: 1.125rem !important;
+  line-height: 1.6 !important;
+}
+
+.presentation-mode .MuiTypography-subtitle1 {
+  font-size: 1.375rem !important;
+  font-weight: 500 !important;
+}
+
+.presentation-mode .MuiTypography-subtitle2 {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+}
+
+.presentation-mode .MuiButton-root {
+  font-size: 1.125rem !important;
+  padding: 12px 32px !important;
+  min-height: 48px !important;
+}
+
+.presentation-mode .MuiButton-sizeSmall {
+  font-size: 1rem !important;
+  padding: 8px 24px !important;
+  min-height: 40px !important;
+}
+
+.presentation-mode .MuiButton-sizeLarge {
+  font-size: 1.25rem !important;
+  padding: 16px 40px !important;
+  min-height: 56px !important;
+}
+
+/* Enhanced contrast and visibility */
+.presentation-mode .MuiCard-root {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.presentation-mode .MuiChip-root {
+  font-size: 1rem !important;
+  height: 36px !important;
+  font-weight: 600 !important;
+}
+
+.presentation-mode .MuiTableCell-root {
+  font-size: 1.125rem !important;
+  padding: 16px !important;
+}
+
+.presentation-mode .MuiTableCell-head {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  background-color: rgba(46, 125, 50, 0.08) !important;
+}
+
+/* Form elements */
+.presentation-mode .MuiTextField-root .MuiInputBase-input {
+  font-size: 1.125rem !important;
+  padding: 16px 14px !important;
+}
+
+.presentation-mode .MuiInputLabel-root {
+  font-size: 1.125rem !important;
+}
+
+.presentation-mode .MuiFormHelperText-root {
+  font-size: 1rem !important;
+}
+
+/* Navigation */
+.presentation-mode .MuiAppBar-root {
+  min-height: 80px !important;
+}
+
+.presentation-mode .MuiToolbar-root {
+  min-height: 80px !important;
+  padding: 0 32px !important;
+}
+
+.presentation-mode .MuiAppBar-root .MuiTypography-h6 {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+}
+
+.presentation-mode .MuiAppBar-root .MuiButton-root {
+  font-size: 1.125rem !important;
+  padding: 12px 24px !important;
+  margin: 0 8px !important;
+}
+
+/* Icons */
+.presentation-mode .MuiSvgIcon-root {
+  font-size: 1.75rem !important;
+}
+
+.presentation-mode .MuiIconButton-root {
+  padding: 12px !important;
+}
+
+.presentation-mode .MuiIconButton-root .MuiSvgIcon-root {
+  font-size: 2rem !important;
+}
+
+/* Stats cards and metrics */
+.presentation-mode .stats-card .MuiTypography-h3,
+.presentation-mode .stats-card .MuiTypography-h4 {
+  font-size: 3rem !important;
+  font-weight: 700 !important;
+}
+
+.presentation-mode .stats-card .MuiTypography-body2 {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+}
+
+/* Alerts and notifications */
+.presentation-mode .MuiAlert-root {
+  font-size: 1.125rem !important;
+  padding: 16px 24px !important;
+}
+
+.presentation-mode .MuiAlert-root .MuiAlert-message {
+  font-size: 1.125rem !important;
+}
+
+/* Tooltips */
+.presentation-mode .MuiTooltip-tooltip {
+  font-size: 1rem !important;
+  padding: 12px 16px !important;
+  max-width: 400px !important;
+}
+
+/* Pagination */
+.presentation-mode .MuiPagination-root .MuiPaginationItem-root {
+  font-size: 1.125rem !important;
+  min-width: 40px !important;
+  height: 40px !important;
+}
+
+/* Tabs */
+.presentation-mode .MuiTab-root {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  min-height: 56px !important;
+  padding: 16px 24px !important;
+}
+
+/* Breadcrumbs */
+.presentation-mode .MuiBreadcrumbs-root {
+  font-size: 1.125rem !important;
+}
+
+/* Loading spinners */
+.presentation-mode .MuiCircularProgress-root {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+/* Spacing adjustments for better presentation */
+.presentation-mode .MuiContainer-root {
+  padding: 32px !important;
+}
+
+.presentation-mode .MuiCardContent-root {
+  padding: 24px !important;
+}
+
+.presentation-mode .MuiBox-root {
+  margin-bottom: 24px;
+}
+
+/* High contrast mode for better visibility */
+.presentation-mode.high-contrast {
+  filter: contrast(1.2) brightness(1.1);
+}
+
+.presentation-mode.high-contrast .MuiCard-root {
+  border: 2px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.presentation-mode.high-contrast .MuiButton-contained {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Animation adjustments for presentations */
+.presentation-mode * {
+  transition-duration: 0.2s !important;
+}
+
+.presentation-mode .MuiFade-root {
+  transition-duration: 0.3s !important;
+}
+
+.presentation-mode .MuiSlide-root {
+  transition-duration: 0.3s !important;
+}
+
+/* Print styles for presentation handouts */
+@media print {
+  .presentation-mode {
+    font-size: 14px !important;
+  }
+  
+  .presentation-mode .MuiAppBar-root,
+  .presentation-mode .MuiDrawer-root,
+  .presentation-mode .MuiFab-root {
+    display: none !important;
+  }
+  
+  .presentation-mode .MuiContainer-root {
+    max-width: none !important;
+    padding: 20px !important;
+  }
+  
+  .presentation-mode .MuiCard-root {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* Mobile presentation adjustments */
+@media (max-width: 768px) {
+  .presentation-mode .MuiTypography-h1 {
+    font-size: 2.5rem !important;
+  }
+  
+  .presentation-mode .MuiTypography-h2 {
+    font-size: 2rem !important;
+  }
+  
+  .presentation-mode .MuiTypography-h3 {
+    font-size: 1.75rem !important;
+  }
+  
+  .presentation-mode .MuiContainer-root {
+    padding: 16px !important;
+  }
+  
+  .presentation-mode .MuiButton-root {
+    font-size: 1rem !important;
+    padding: 10px 24px !important;
+  }
+}
