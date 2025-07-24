@@ -1,5 +1,6 @@
 const express = require('express');
 const { query } = require('../database/connection');
+const { normalizeSupplementsArray, normalizeSupplementData } = require('../utils/dataHelpers');
 const router = express.Router();
 
 // GET /api/public/supplements - Get all certified supplements (public access)
@@ -34,6 +35,9 @@ router.get('/supplements', async (req, res) => {
     queryParams.push(limit, offset);
 
     const result = await query(queryText, queryParams);
+
+    // Normalize warnings data for all supplements to prevent React child object errors
+    const normalizedSupplements = normalizeSupplementsArray(result.rows);
 
     // Get total count for pagination
     let countQuery = `
@@ -92,8 +96,13 @@ router.get('/supplements/:id', async (req, res) => {
       return res.status(404).json({ error: 'Certified supplement not found' });
     }
 
+    const supplement = result.rows[0];
+    
+    // Use the centralized data normalization utility
+    const normalizedSupplement = normalizeSupplementData(supplement);
+
     res.json({
-      supplement: result.rows[0]
+      supplement: normalizedSupplement
     });
   } catch (error) {
     console.error('Get public supplement error:', error);

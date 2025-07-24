@@ -112,13 +112,16 @@ const IngredientsStep = ({ data, updateData, onNext, onBack }) => {
   };
 
   const isFormValid = () => {
+    if (!data.components || !data.components[0] || !data.components[0].activeIngredients) {
+      return false;
+    }
     const activeIngredients = data.components[0].activeIngredients;
     return activeIngredients.length > 0 && 
            activeIngredients.every(ing => 
              ing.name && ing.name.trim() && 
              ing.commonName && ing.commonName.trim() && 
-             ing.quantity && ing.quantity.value > 0 &&
-             ing.supplierInfo && ing.supplierInfo.supplierName && ing.supplierInfo.supplierName.trim()
+             ing.quantity && ing.quantity.value > 0
+             // Removed supplier requirement for draft validation - can be added later
            );
   };
 
@@ -146,13 +149,13 @@ const IngredientsStep = ({ data, updateData, onNext, onBack }) => {
           </Button>
         </Box>
 
-        {data.components[0].activeIngredients.length === 0 && (
+        {(data.components[0]?.activeIngredients || []).length === 0 && (
           <Alert severity="info" sx={{ mb: 2 }}>
             Add at least one active ingredient to continue
           </Alert>
         )}
 
-        {data.components[0].activeIngredients.map((ingredient, index) => (
+        {(data.components[0]?.activeIngredients || []).map((ingredient, index) => (
           <Accordion 
             key={index} 
             expanded={expandedIngredient === index}
@@ -317,7 +320,7 @@ const IngredientsStep = ({ data, updateData, onNext, onBack }) => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    label="Supplier Name *"
+                    label="Supplier Name"
                     value={ingredient.supplierInfo?.supplierName || ''}
                     onChange={(e) => {
                       const updatedComponents = [...data.components];
@@ -399,13 +402,13 @@ const IngredientsStep = ({ data, updateData, onNext, onBack }) => {
           </Button>
         </Box>
 
-        {data.components[0].excipients.length === 0 && (
+        {(data.components[0]?.excipients || []).length === 0 && (
           <Alert severity="info" sx={{ mb: 2 }}>
             Add excipients (inactive ingredients) if applicable
           </Alert>
         )}
 
-        {data.components[0].excipients.map((excipient, index) => (
+        {(data.components[0]?.excipients || []).map((excipient, index) => (
           <Accordion 
             key={index}
             expanded={expandedExcipient === index}

@@ -540,18 +540,26 @@ const AdminReviewPage = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <List>
-                  {osiData.warnings.map((warning, index) => (
-                    <ListItem key={index} divider>
-                      <ListItemIcon>
-                        <WarningIcon color="warning" />
-                      </ListItemIcon>
-                      <ListItemText primary={
-                        typeof warning === 'string' 
-                          ? warning 
-                          : warning?.text || warning?.warning || 'Warning information not available'
-                      } />
-                    </ListItem>
-                  ))}
+                  {osiData.warnings.map((warning, index) => {
+                    // Handle both string warnings and structured warning objects
+                    let warningText = '';
+                    if (typeof warning === 'string') {
+                      warningText = warning;
+                    } else if (warning && typeof warning === 'object') {
+                      warningText = warning.text || warning.warning || 'Warning information not available';
+                    } else {
+                      warningText = 'Warning information not available';
+                    }
+                    
+                    return (
+                      <ListItem key={index} divider>
+                        <ListItemIcon>
+                          <WarningIcon color="warning" />
+                        </ListItemIcon>
+                        <ListItemText primary={warningText} />
+                      </ListItem>
+                    );
+                  })}
                 </List>
               </AccordionDetails>
             </Accordion>

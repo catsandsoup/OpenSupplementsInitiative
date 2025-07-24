@@ -261,7 +261,7 @@ const HealthClaimsStep = ({ data, updateData, onNext, onBack }) => {
           </Button>
         </Box>
 
-        {data.clinicalTrials.map((trial, index) => (
+        {(data.clinicalTrials || []).map((trial, index) => (
           <Accordion key={index} sx={{ mb: 2 }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -384,7 +384,7 @@ const HealthClaimsStep = ({ data, updateData, onNext, onBack }) => {
           </Button>
         </Box>
 
-        {data.warnings.map((warning, index) => (
+        {(data.warnings || []).map((warning, index) => (
           <Accordion 
             key={index}
             expanded={expandedWarning === index}
@@ -483,7 +483,7 @@ const HealthClaimsStep = ({ data, updateData, onNext, onBack }) => {
               Contains Allergens
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
-              {data.allergenInformation.containsAllergens.map((allergen, index) => (
+              {(data.allergenInformation?.containsAllergens || []).map((allergen, index) => (
                 <Chip
                   key={index}
                   label={allergen}
@@ -509,7 +509,7 @@ const HealthClaimsStep = ({ data, updateData, onNext, onBack }) => {
               Free-From Claims
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
-              {data.allergenInformation.freeOfClaims.map((claim, index) => (
+              {(data.allergenInformation?.freeOfClaims || []).map((claim, index) => (
                 <Chip
                   key={index}
                   label={claim}

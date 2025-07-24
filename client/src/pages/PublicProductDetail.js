@@ -18,7 +18,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Link,
+
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -34,8 +34,6 @@ import {
   Science as ScienceIcon,
   Warning as WarningIcon,
   Factory as FactoryIcon,
-  LocalShipping as ShippingIcon,
-
   ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
   Info as InfoIcon,
@@ -140,8 +138,18 @@ const PublicProductDetail = () => {
   const supplierDetails = additionalInfo.supplierDetails || [];
   const permittedIndications = osiData.permittedIndications || [];
   const warnings = osiData.warnings || [];
+  const structuredWarnings = osiData.structuredWarnings || [];
   const dosageInfo = osiData.dosageInformation || {};
   const certStatus = getCertificateStatus();
+
+  // Safety function to ensure we never pass objects as React children
+  const safeRenderText = (value, fallback = 'Information not available') => {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') {
+      return value.text || value.warning || value.indication || fallback;
+    }
+    return fallback;
+  };
 
   return (
     <Container maxWidth="lg">
@@ -371,19 +379,26 @@ const PublicProductDetail = () => {
                   Permitted Indications
                 </Typography>
                 <List>
-                  {permittedIndications.map((indication, index) => (
-                    <ListItem key={index} sx={{ pl: 0 }}>
-                      <ListItemIcon>
-                        <CheckCircleIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={indication.text || indication}
-                        secondary={indication.evidenceNotes}
-                        primaryTypographyProps={{ variant: 'body2' }}
-                        secondaryTypographyProps={{ variant: 'caption' }}
-                      />
-                    </ListItem>
-                  ))}
+                  {permittedIndications.map((indication, index) => {
+                    const indicationText = safeRenderText(indication, 'Indication not available');
+                    const evidenceNotes = typeof indication === 'object' && indication.evidenceNotes 
+                      ? safeRenderText(indication.evidenceNotes, null) 
+                      : null;
+                    
+                    return (
+                      <ListItem key={index} sx={{ pl: 0 }}>
+                        <ListItemIcon>
+                          <CheckCircleIcon color="primary" />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={indicationText}
+                          secondary={evidenceNotes}
+                          primaryTypographyProps={{ variant: 'body2' }}
+                          secondaryTypographyProps={{ variant: 'caption' }}
+                        />
+                      </ListItem>
+                    );
+                  })}
                 </List>
               </Box>
             ) : (
@@ -418,18 +433,36 @@ const PublicProductDetail = () => {
               <AccordionDetails>
                 {warnings && warnings.length > 0 ? (
                   <List>
-                    {warnings.map((warning, index) => (
-                      <ListItem key={index} sx={{ pl: 0 }}>
-                        <ListItemIcon>
-                          <WarningIcon color="warning" />
-                        </ListItemIcon>
-                        <ListItemText primary={
-                          typeof warning === 'string' 
-                            ? warning 
-                            : warning?.text || warning?.warning || 'Warning information not available'
-                        } />
-                      </ListItem>
-                    ))}
+                    {warnings.map((warning, index) => {
+                      // Handle both string warnings and structured warning objects
+                      let warningText = '';
+                      let warningType = '';
+                      let warningSource = '';
+                      
+                      if (typeof warning === 'string') {
+                        warningText = warning;
+                      } else if (warning && typeof warning === 'object') {
+                        warningText = warning.text || warning.warning || 'Warning information not available';
+                        warningType = warning.type || '';
+                        warningSource = warning.source || '';
+                      } else {
+                        warningText = 'Warning information not available';
+                      }
+                      
+                      return (
+                        <ListItem key={index} sx={{ pl: 0 }}>
+                          <ListItemIcon>
+                            <WarningIcon color="warning" />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={warningText}
+                            secondary={warningType && warningSource ? `${warningType} - ${warningSource}` : (warningType || warningSource || null)}
+                            primaryTypographyProps={{ variant: 'body2' }}
+                            secondaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
+                          />
+                        </ListItem>
+                      );
+                    })}
                   </List>
                 ) : (
                   <Typography variant="body2" color="text.secondary">

@@ -37,6 +37,35 @@ router.get('/', authenticateToken, async (req, res) => {
 
     const result = await query(queryText, queryParams);
 
+    // Normalize warnings data for all supplements to prevent React child object errors
+    result.rows.forEach(supplement => {
+      if (supplement.osi_data && supplement.osi_data.warnings) {
+        supplement.osi_data.warnings = supplement.osi_data.warnings.map(warning => {
+          if (typeof warning === 'string') {
+            return warning;
+          } else if (warning && typeof warning === 'object') {
+            return warning.text || warning.warning || 'Warning information not available';
+          }
+          return 'Warning information not available';
+        });
+      }
+
+      // Also handle structuredWarnings if they exist
+      if (supplement.osi_data && supplement.osi_data.structuredWarnings) {
+        // If we have structured warnings but no regular warnings, convert them
+        if (!supplement.osi_data.warnings || supplement.osi_data.warnings.length === 0) {
+          supplement.osi_data.warnings = supplement.osi_data.structuredWarnings.map(warning => {
+            if (typeof warning === 'string') {
+              return warning;
+            } else if (warning && typeof warning === 'object') {
+              return warning.text || warning.warning || 'Warning information not available';
+            }
+            return 'Warning information not available';
+          });
+        }
+      }
+    });
+
     res.json({
       supplements: result.rows
     });
@@ -73,8 +102,37 @@ router.get('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Supplement not found' });
     }
 
+    const supplement = result.rows[0];
+    
+    // Normalize warnings data to prevent React child object errors
+    if (supplement.osi_data && supplement.osi_data.warnings) {
+      supplement.osi_data.warnings = supplement.osi_data.warnings.map(warning => {
+        if (typeof warning === 'string') {
+          return warning;
+        } else if (warning && typeof warning === 'object') {
+          return warning.text || warning.warning || 'Warning information not available';
+        }
+        return 'Warning information not available';
+      });
+    }
+
+    // Also handle structuredWarnings if they exist
+    if (supplement.osi_data && supplement.osi_data.structuredWarnings) {
+      // If we have structured warnings but no regular warnings, convert them
+      if (!supplement.osi_data.warnings || supplement.osi_data.warnings.length === 0) {
+        supplement.osi_data.warnings = supplement.osi_data.structuredWarnings.map(warning => {
+          if (typeof warning === 'string') {
+            return warning;
+          } else if (warning && typeof warning === 'object') {
+            return warning.text || warning.warning || 'Warning information not available';
+          }
+          return 'Warning information not available';
+        });
+      }
+    }
+
     res.json({
-      supplement: result.rows[0]
+      supplement: supplement
     });
   } catch (error) {
     console.error('Get supplement error:', error);

@@ -68,13 +68,13 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
       },
       {
         label: 'Active Ingredients',
-        complete: data.components[0].activeIngredients.length > 0,
-        details: `${data.components[0].activeIngredients.length} active ingredient(s)`
+        complete: (data.components[0]?.activeIngredients || []).length > 0,
+        details: `${(data.components[0]?.activeIngredients || []).length} active ingredient(s)`
       },
       {
         label: 'Health Claims',
-        complete: data.permittedIndications.length > 0,
-        details: `${data.permittedIndications.length} health claim(s)`
+        complete: (data.permittedIndications || []).length > 0,
+        details: `${(data.permittedIndications || []).length} health claim(s)`
       },
       {
         label: 'Supporting Documents',
@@ -144,11 +144,11 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2">Dosage Form</Typography>
-              <Typography variant="body1">{data.components[0].dosageForm}</Typography>
+              <Typography variant="body1">{data.components[0]?.dosageForm || 'Not specified'}</Typography>
             </Grid>
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2">Route of Administration</Typography>
-              <Typography variant="body1">{data.components[0].routeOfAdministration}</Typography>
+              <Typography variant="body1">{data.components[0]?.routeOfAdministration || 'Not specified'}</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography variant="subtitle2">Adult Dosage</Typography>
@@ -162,7 +162,7 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
       <Accordion sx={{ mb: 2 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h6">
-            Active Ingredients ({data.components[0].activeIngredients.length})
+            Active Ingredients ({(data.components[0]?.activeIngredients || []).length})
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -177,7 +177,7 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.components[0].activeIngredients.map((ingredient, index) => (
+                {(data.components[0]?.activeIngredients || []).map((ingredient, index) => (
                   <TableRow key={index}>
                     <TableCell>{ingredient.name}</TableCell>
                     <TableCell>{ingredient.commonName}</TableCell>
@@ -202,12 +202,12 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
       <Accordion sx={{ mb: 2 }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h6">
-            Health Claims ({data.permittedIndications.length})
+            Health Claims ({(data.permittedIndications || []).length})
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <List>
-            {data.permittedIndications.map((indication, index) => (
+            {(data.permittedIndications || []).map((indication, index) => (
               <ListItem key={index} divider>
                 <ListItemText
                   primary={
@@ -224,34 +224,47 @@ const ReviewStep = ({ data, onSubmit, onBack, onSaveDraft, loading }) => {
       </Accordion>
 
       {/* Warnings */}
-      {data.warnings.length > 0 && (
+      {(data.warnings || []).length > 0 && (
         <Accordion sx={{ mb: 2 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">
-              Warnings & Advisories ({data.warnings.length})
+              Warnings & Advisories ({(data.warnings || []).length})
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <List>
-              {data.warnings.map((warning, index) => (
-                <ListItem key={index} divider>
-                  <ListItemText
-                    primary={
-                      typeof warning === 'string' 
-                        ? warning 
-                        : warning?.text || warning?.warning || 'Warning information not available'
-                    }
-                    secondary={
-                      typeof warning === 'object' && (
-                        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                          <Chip label={warning.type || 'General'} size="small" />
-                          <Chip label={warning.source || 'Unknown'} size="small" variant="outlined" />
-                        </Box>
-                      )
-                    }
-                  />
-                </ListItem>
-              ))}
+              {(data.warnings || []).map((warning, index) => {
+                // Handle both string warnings and structured warning objects
+                let warningText = '';
+                let warningType = null;
+                let warningSource = null;
+                
+                if (typeof warning === 'string') {
+                  warningText = warning;
+                } else if (warning && typeof warning === 'object') {
+                  warningText = warning.text || warning.warning || 'Warning information not available';
+                  warningType = warning.type;
+                  warningSource = warning.source;
+                } else {
+                  warningText = 'Warning information not available';
+                }
+                
+                return (
+                  <ListItem key={index} divider>
+                    <ListItemText
+                      primary={warningText}
+                      secondary={
+                        (warningType || warningSource) && (
+                          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                            {warningType && <Chip label={warningType} size="small" />}
+                            {warningSource && <Chip label={warningSource} size="small" variant="outlined" />}
+                          </Box>
+                        )
+                      }
+                    />
+                  </ListItem>
+                );
+              })}
             </List>
           </AccordionDetails>
         </Accordion>
